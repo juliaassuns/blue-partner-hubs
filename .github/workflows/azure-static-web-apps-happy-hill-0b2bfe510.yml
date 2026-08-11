@@ -1,13 +1,11 @@
-name: Azure Static Web Apps CI/CD
+# Desativado: o output "build" deste workflow não existe mais desde a
+# migração para Azure App Service (build agora sai em .output/, preset
+# node-server). Recurso happy-hill-0b2bfe510 mantido, mas sem deploy
+# automático. Ver .github/workflows/deploy-app-service.yml para o deploy atual.
+name: Azure Static Web Apps CI/CD (desativado)
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+  workflow_dispatch: {}
 
 jobs:
   build_and_deploy_job:
