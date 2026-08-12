@@ -85,15 +85,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, revendas CSP, clientes, certificações e renovações.",
+          "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, parceiros MAICPP, clientes, certificações e renovações.",
       },
       { name: "author", content: "BluePartner" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "Dashboard Executivo | BluePartner Intelligence Center" },
       { name: "twitter:title", content: "Dashboard Executivo | BluePartner Intelligence Center" },
-      { property: "og:description", content: "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, revendas CSP, clientes, certificações e renovações." },
-      { name: "twitter:description", content: "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, revendas CSP, clientes, certificações e renovações." },
+      { property: "og:description", content: "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, parceiros MAICPP, clientes, certificações e renovações." },
+      { name: "twitter:description", content: "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, parceiros MAICPP, clientes, certificações e renovações." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f0fc01a1-4af5-402d-8c43-fb9f2406ef07/id-preview-2b03f1a4--1fe6b26e-79cc-40ba-b13e-4c2dd2332ab0.lovable.app-1786046101616.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f0fc01a1-4af5-402d-8c43-fb9f2406ef07/id-preview-2b03f1a4--1fe6b26e-79cc-40ba-b13e-4c2dd2332ab0.lovable.app-1786046101616.png" },
     ],

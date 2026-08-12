@@ -37,12 +37,12 @@ function contexto() {
     .join("; ");
 
   return `DADOS DA PLATAFORMA BLUEPARTNER (${new Date().toLocaleDateString("pt-BR")}):
-Totais: ${totais.revendas} revendas CSP, ${totais.clientes} clientes, ${totais.usuariosGerenciados} usuários, MAICPP global ${totais.maicppGlobal}/100, ${totais.designacoes}/6 designações.
+Totais: ${totais.revendas} parceiros MAICPP, ${totais.clientes} clientes, ${totais.usuariosGerenciados} usuários, MAICPP global ${totais.maicppGlobal}/100, ${totais.designacoes}/6 designações.
 
 ÁREAS SOLUTIONS PARTNER:
 ${areas}
 
-TOP 20 REVENDAS:
+TOP 20 PARCEIROS MAICPP:
 ${top}
 
 OPORTUNIDADES NA BASE DE CLIENTES: ${oportunidades}. Potencial total estimado: +${totais.pontosPotenciais} pontos.

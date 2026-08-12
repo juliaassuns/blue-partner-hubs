@@ -15,7 +15,7 @@ export const Route = createFileRoute("/copilot")({
       {
         name: "description",
         content:
-          "Assistente de IA interno que responde sobre MAICPP, revendas, clientes, certificações e planos de crescimento.",
+          "Assistente de IA interno que responde sobre MAICPP, parceiros MAICPP, clientes, certificações e planos de crescimento.",
       },
       { property: "og:title", content: "Copilot BluePartner" },
       { property: "og:description", content: "Assistente de IA com todos os dados da plataforma." },
@@ -28,7 +28,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 const SUGESTOES = [
   "O que falta para renovar Security?",
-  "Quais revendas possuem maior potencial para Modern Work?",
+  "Quais parceiros possuem maior potencial para Modern Work?",
   "Quais clientes podem gerar pontos para Data & AI?",
   "Quais certificações devemos priorizar?",
   "Quais especializações estão em risco?",
@@ -110,7 +110,7 @@ function Copilot() {
                   <div>
                     <p className="font-medium">Como posso ajudar?</p>
                     <p className="text-sm text-muted-foreground">
-                      Pergunte sobre pontuação MAICPP, revendas, clientes ou planos de crescimento.
+                      Pergunte sobre pontuação MAICPP, parceiros MAICPP, clientes ou planos de crescimento.
                     </p>
                   </div>
                 </div>

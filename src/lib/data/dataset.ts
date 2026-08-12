@@ -157,7 +157,34 @@ export type Revenda = {
   historico: PontoHistoricoRevenda[];
   variacaoClientes3m: number;
   variacaoPontos3m: number;
+  areas: Record<AreaId, Area>;
 };
+
+// Pontuação Solutions Partner própria de cada parceiro MAICPP (não é a mesma
+// coisa que `contribuicoes`, que é quanto o parceiro soma ao placar global da
+// BluePartner). Gerada de forma independente por área/parceiro — não precisa
+// somar exatamente ao placar global, é uma aproximação de mock.
+function gerarAreasRevenda(): Record<AreaId, Area> {
+  const resultado = {} as Record<AreaId, Area>;
+  for (const base of AREAS) {
+    const pontuacao = int(20, 97);
+    const performance = Math.round(pontuacao * (0.34 + rnd() * 0.08));
+    const skilling = Math.round(pontuacao * (0.28 + rnd() * 0.08));
+    const customerSuccess = Math.max(0, pontuacao - performance - skilling);
+    resultado[base.id] = {
+      id: base.id,
+      nome: base.nome,
+      pontuacao,
+      meta: base.meta,
+      renovacao: base.renovacao,
+      performance,
+      skilling,
+      customerSuccess,
+      designacao: pontuacao >= base.meta * 0.85,
+    };
+  }
+  return resultado;
+}
 
 const HOJE_HIST = new Date(2026, 7, 1);
 function mesLabelRevenda(indice: number, total: number) {
@@ -244,6 +271,7 @@ export const revendas: Revenda[] = Array.from({ length: 70 }, (_, i) => {
     historico,
     variacaoClientes3m: Math.round(mediaClientesUltimos3 - mediaClientesAnteriores3),
     variacaoPontos3m: Number((mediaPontosUltimos3 - mediaPontosAnteriores3).toFixed(1)),
+    areas: gerarAreasRevenda(),
   };
 }).sort((a, b) => b.contribuicaoMaicpp - a.contribuicaoMaicpp);
 

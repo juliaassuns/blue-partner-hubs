@@ -119,7 +119,7 @@ function ClienteDetalhe() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Revenda responsável</CardTitle>
+          <CardTitle>Parceiro MAICPP responsável</CardTitle>
         </CardHeader>
         <CardContent>
           <Link

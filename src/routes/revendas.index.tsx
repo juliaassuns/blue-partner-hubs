@@ -27,14 +27,14 @@ import { rankingRevendas } from "@/lib/data/dataset";
 export const Route = createFileRoute("/revendas/")({
   head: () => ({
     meta: [
-      { title: "Revendas CSP | BluePartner Intelligence Center" },
+      { title: "Parceiros MAICPP | BluePartner Intelligence Center" },
       {
         name: "description",
         content:
-          "Ranking, saúde e potencial das aproximadamente 70 revendas CSP do ecossistema BluePartner.",
+          "Ranking, saúde e potencial dos aproximadamente 70 parceiros MAICPP do ecossistema BluePartner.",
       },
-      { property: "og:title", content: "Revendas CSP | BluePartner" },
-      { property: "og:description", content: "Gestão completa das revendas CSP BluePartner." },
+      { property: "og:title", content: "Parceiros MAICPP | BluePartner" },
+      { property: "og:description", content: "Gestão completa dos parceiros MAICPP BluePartner." },
     ],
   }),
   component: RevendasIndex,
@@ -68,10 +68,10 @@ function RevendasIndex() {
 
   return (
     <div className="space-y-6">
-      <PageHeader titulo="Revendas CSP" descricao={`${rankingRevendas.length} revendas no ecossistema BluePartner`} />
+      <PageHeader titulo="Parceiros MAICPP" descricao={`${rankingRevendas.length} parceiros MAICPP no ecossistema BluePartner`} />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Total de revendas" valor={rankingRevendas.length} />
+        <KpiCard label="Total de parceiros" valor={rankingRevendas.length} />
         <KpiCard label="Ativas" valor={rankingRevendas.filter((r) => r.status === "Ativa").length} tom="success" />
         <KpiCard label="Em risco" valor={emRisco.length} tom="danger" detalhe="saúde abaixo de 55" />
         <KpiCard
@@ -82,8 +82,8 @@ function RevendasIndex() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <ListaCard titulo="Top 10 revendas" icone={<Trophy className="size-4 text-warning" />} itens={top10.map((r) => ({ id: r.id, nome: r.nome, valor: `${r.contribuicaoMaicpp.toFixed(1)} pts` }))} />
-        <ListaCard titulo="Revendas em risco" icone={<AlertTriangle className="size-4 text-destructive" />} itens={emRisco.map((r) => ({ id: r.id, nome: r.nome, valor: `saúde ${r.saude}` }))} />
+        <ListaCard titulo="Top 10 parceiros" icone={<Trophy className="size-4 text-warning" />} itens={top10.map((r) => ({ id: r.id, nome: r.nome, valor: `${r.contribuicaoMaicpp.toFixed(1)} pts` }))} />
+        <ListaCard titulo="Parceiros em risco" icone={<AlertTriangle className="size-4 text-destructive" />} itens={emRisco.map((r) => ({ id: r.id, nome: r.nome, valor: `saúde ${r.saude}` }))} />
         <ListaCard titulo="Maior potencial" icone={<TrendingUp className="size-4 text-success" />} itens={maiorPotencial.map((r) => ({ id: r.id, nome: r.nome, valor: `${r.potencial}%` }))} />
       </div>
 
@@ -94,7 +94,7 @@ function RevendasIndex() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <Input placeholder="Buscar revenda..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+            <Input placeholder="Buscar parceiro..." value={busca} onChange={(e) => setBusca(e.target.value)} />
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>
@@ -128,7 +128,7 @@ function RevendasIndex() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Revenda</TableHead>
+                  <TableHead>Parceiro</TableHead>
                   <TableHead>Gerente</TableHead>
                   <TableHead>Segmento</TableHead>
                   <TableHead className="text-right">Clientes</TableHead>
@@ -183,7 +183,7 @@ function RevendasIndex() {
                 {lista.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
-                      Nenhuma revenda encontrada com os filtros atuais.
+                      Nenhum parceiro encontrado com os filtros atuais.
                     </TableCell>
                   </TableRow>
                 )}

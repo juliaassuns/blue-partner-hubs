@@ -17,7 +17,7 @@ import {
   YAxis,
 } from "recharts";
 
-import { KpiCard, PageHeader, StatusDot, tooltipStyle } from "@/components/ui-kit";
+import { KpiCard, PageHeader, ScoreBar, SemaforoBadge, StatusDot, tooltipStyle } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AREAS, clientesPorRevenda, rankingRevendas, revendaById } from "@/lib/data/dataset";
+import { AREAS, clientesPorRevenda, diasRestantes, rankingRevendas, revendaById, semaforo } from "@/lib/data/dataset";
 
 export const Route = createFileRoute("/revendas/$id")({
   loader: ({ params }) => {
@@ -39,16 +39,16 @@ export const Route = createFileRoute("/revendas/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.nome ?? "Revenda"} | Revendas CSP BluePartner` },
+      { title: `${loaderData?.nome ?? "Parceiro"} | Parceiros MAICPP BluePartner` },
       {
         name: "description",
-        content: `Contribuição MAICPP, clientes, saúde e próximas ações da revenda ${loaderData?.nome ?? ""}.`,
+        content: `Contribuição MAICPP, clientes, saúde e próximas ações do parceiro ${loaderData?.nome ?? ""}.`,
       },
-      { property: "og:title", content: `${loaderData?.nome ?? "Revenda"} | BluePartner` },
-      { property: "og:description", content: "Ficha completa da revenda CSP." },
+      { property: "og:title", content: `${loaderData?.nome ?? "Parceiro"} | BluePartner` },
+      { property: "og:description", content: "Ficha completa do parceiro MAICPP." },
     ],
   }),
-  notFoundComponent: () => <p className="text-muted-foreground">Revenda não encontrada.</p>,
+  notFoundComponent: () => <p className="text-muted-foreground">Parceiro não encontrado.</p>,
   errorComponent: ({ error }) => <p role="alert">{error.message}</p>,
   component: RevendaDetalhe,
 });
@@ -63,7 +63,7 @@ function RevendaDetalhe() {
   return (
     <div className="space-y-6">
       <Link to="/revendas" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Revendas CSP
+        <ArrowLeft className="size-4" /> Parceiros MAICPP
       </Link>
       <PageHeader
         titulo={revenda.nome}
@@ -88,6 +88,42 @@ function RevendaDetalhe() {
         <KpiCard label="Saúde geral" valor={`${revenda.saude}%`} tom={revenda.saude > 70 ? "success" : revenda.saude > 50 ? "warning" : "danger"} />
         <KpiCard label="Potencial de crescimento" valor={`${revenda.potencial}%`} tom="success" />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Solutions Partner do parceiro</CardTitle>
+          <CardDescription>Pontuação própria deste parceiro por área e metas para novas designações</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {AREAS.map((a) => {
+            const areaRevenda = revenda.areas[a.id];
+            const nivel = semaforo(areaRevenda.pontuacao, areaRevenda.meta);
+            return (
+              <div key={a.id} className="rounded-md border border-border bg-secondary/30 p-4">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <span className="font-medium">{areaRevenda.nome}</span>
+                  <SemaforoBadge nivel={nivel} />
+                </div>
+                <p className="mb-2 text-2xl font-semibold tabular-nums">
+                  {areaRevenda.pontuacao}
+                  <span className="text-sm text-muted-foreground">/{areaRevenda.meta}</span>
+                </p>
+                <ScoreBar valor={areaRevenda.pontuacao} meta={areaRevenda.meta} nivel={nivel} />
+                <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    Perf. {areaRevenda.performance} · Skilling {areaRevenda.skilling} · CS {areaRevenda.customerSuccess}
+                  </span>
+                  {areaRevenda.designacao ? (
+                    <Badge variant="outline" className="border-success/40 text-success">designação ativa</Badge>
+                  ) : (
+                    <span>renova em {diasRestantes(areaRevenda.renovacao)}d</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card>
@@ -128,7 +164,7 @@ function RevendaDetalhe() {
         <Card>
           <CardHeader>
             <CardTitle>Próximas ações</CardTitle>
-            <CardDescription>Recomendações para a revenda</CardDescription>
+            <CardDescription>Recomendações para o parceiro</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {revenda.proximasAcoes.map((a) => (
@@ -152,7 +188,7 @@ function RevendaDetalhe() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Evolução da revenda (12 meses)</CardTitle>
+          <CardTitle>Evolução do parceiro (12 meses)</CardTitle>
           <CardDescription>Contribuição MAICPP e quantidade de clientes ao longo do tempo</CardDescription>
         </CardHeader>
         <CardContent className="h-[280px]">
@@ -173,7 +209,7 @@ function RevendaDetalhe() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Clientes da revenda</CardTitle>
+          <CardTitle>Clientes do parceiro</CardTitle>
           <CardDescription>{clientes.length} clientes — clique para abrir o detalhe</CardDescription>
         </CardHeader>
         <CardContent>

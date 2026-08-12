@@ -55,7 +55,7 @@ function Relatorios() {
 
   return (
     <div className="space-y-6">
-      <PageHeader titulo="Relatórios e Analytics" descricao="Comparativos entre revendas, clientes e soluções" />
+      <PageHeader titulo="Relatórios e Analytics" descricao="Comparativos entre parceiros MAICPP, clientes e soluções" />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
@@ -80,7 +80,7 @@ function Relatorios() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Revendas por segmento</CardTitle>
+            <CardTitle>Parceiros por segmento</CardTitle>
             <CardDescription>Distribuição do canal</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
@@ -101,14 +101,14 @@ function Relatorios() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Heatmap de contribuição por revenda e solução</CardTitle>
-          <CardDescription>Top 15 revendas — intensidade proporcional aos pontos</CardDescription>
+          <CardTitle>Heatmap de contribuição por parceiro e solução</CardTitle>
+          <CardDescription>Top 15 parceiros — intensidade proporcional aos pontos</CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="text-left text-xs text-muted-foreground">
-                <th className="py-2">Revenda</th>
+                <th className="py-2">Parceiro</th>
                 {AREAS.map((a) => (
                   <th key={a.id} className="px-2 py-2 text-center">{a.nome}</th>
                 ))}

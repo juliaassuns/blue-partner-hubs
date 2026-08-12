@@ -31,14 +31,14 @@ const grupos: { label: string; items: { title: string; url: string; icon: typeof
   {
     label: "Visão geral",
     items: [
-      { title: "Dashboard Executivo", url: "/", icon: LayoutDashboard },
+      { title: "Dashboard", url: "/", icon: LayoutDashboard },
       { title: "Solutions Partner", url: "/solutions", icon: Award },
     ],
   },
   {
     label: "Ecossistema",
     items: [
-      { title: "Revendas CSP", url: "/revendas", icon: Building2 },
+      { title: "Parceiros MAICPP", url: "/revendas", icon: Building2 },
       { title: "Clientes", url: "/clientes", icon: Users },
       { title: "Clientes (Partner Center)", url: "/clientes-partner-center", icon: Cloud },
     ],

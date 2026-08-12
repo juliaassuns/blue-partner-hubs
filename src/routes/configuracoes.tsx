@@ -52,7 +52,7 @@ function Configuracoes() {
           {[
             "Certificações expirando em 30/60/90 dias",
             "Renovação de designação em menos de 120 dias",
-            "Revenda com queda de saúde",
+            "Parceiro com queda de saúde",
             "Cliente sem Copilot ou Defender",
           ].map((t, i) => (
             <div key={t} className="flex items-center justify-between gap-4 rounded border border-border bg-secondary/30 p-3">

@@ -41,16 +41,16 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard Executivo | BluePartner Intelligence Center" },
+      { title: "Dashboard | BluePartner Intelligence Center" },
       {
         name: "description",
         content:
-          "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, revendas CSP, clientes, certificações e renovações.",
+          "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, parceiros MAICPP, clientes, certificações e renovações.",
       },
-      { property: "og:title", content: "Dashboard Executivo | BluePartner Intelligence Center" },
+      { property: "og:title", content: "Dashboard | BluePartner Intelligence Center" },
       {
         property: "og:description",
-        content: "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, revendas CSP, clientes, certificações e renovações.",
+        content: "KPIs consolidados do ecossistema Microsoft da BluePartner: MAICPP, parceiros MAICPP, clientes, certificações e renovações.",
       },
     ],
   }),
@@ -73,12 +73,12 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <PageHeader
-        titulo="Dashboard Executivo"
+        titulo="Dashboard"
         descricao="Panorama consolidado do ecossistema Microsoft Partner da BluePartner"
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Revendas CSP" valor={totais.revendas} detalhe="parceiros ativos no programa" icone={<Building2 className="size-4" />} />
+        <KpiCard label="Parceiros MAICPP" valor={totais.revendas} detalhe="parceiros ativos no programa" icone={<Building2 className="size-4" />} />
         <KpiCard label="Clientes" valor={totais.clientes} detalhe={`${totais.usuariosGerenciados.toLocaleString("pt-BR")} usuários gerenciados`} icone={<Users className="size-4" />} />
         <KpiCard label="Certificações" valor={totais.certificacoes} detalhe={`${totais.certificacoesValidas} válidas · ${totais.certificacoesExpirando} expirando`} icone={<BadgeCheck className="size-4" />} />
         <KpiCard label="Especializações" valor={totais.especializacoes} detalhe={`${totais.especializacoesConquistadas} conquistadas`} icone={<GraduationCap className="size-4" />} />
@@ -174,7 +174,7 @@ function Dashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Top 10 revendas por contribuição MAICPP</CardTitle>
+          <CardTitle>Top 10 parceiros MAICPP por contribuição</CardTitle>
           <CardDescription>Contribuição consolidada em pontos</CardDescription>
         </CardHeader>
         <CardContent className="h-[320px]">

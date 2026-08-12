@@ -175,7 +175,7 @@ function AreaDetalhe() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Revendas que mais contribuem</CardTitle>
+            <CardTitle>Parceiros que mais contribuem</CardTitle>
             <CardDescription>Contribuição em pontos nesta área</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">

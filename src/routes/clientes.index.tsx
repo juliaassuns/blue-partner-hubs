@@ -29,7 +29,7 @@ export const Route = createFileRoute("/clientes/")({
       {
         name: "description",
         content:
-          "Base completa de clientes por revenda CSP com adoção de produtos Microsoft e score de oportunidade.",
+          "Base completa de clientes por parceiro MAICPP com adoção de produtos Microsoft e score de oportunidade.",
       },
       { property: "og:title", content: "Clientes | BluePartner" },
       { property: "og:description", content: "Drill down de clientes e oportunidades Microsoft." },
@@ -69,7 +69,7 @@ function ClientesIndex() {
     <div className="space-y-6">
       <PageHeader
         titulo="Clientes"
-        descricao="Drill down por revenda, produtos utilizados e oportunidades detectadas"
+        descricao="Drill down por parceiro MAICPP, produtos utilizados e oportunidades detectadas"
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
@@ -89,9 +89,9 @@ function ClientesIndex() {
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <Input placeholder="Buscar cliente..." value={busca} onChange={(e) => setBusca(e.target.value)} />
             <Select value={revenda} onValueChange={setRevenda}>
-              <SelectTrigger><SelectValue placeholder="Revenda" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Parceiro" /></SelectTrigger>
               <SelectContent className="max-h-72">
-                <SelectItem value="todas">Todas as revendas</SelectItem>
+                <SelectItem value="todas">Todos os parceiros</SelectItem>
                 {rankingRevendas.map((r) => (
                   <SelectItem key={r.id} value={r.id}>{r.nome}</SelectItem>
                 ))}
@@ -121,7 +121,7 @@ function ClientesIndex() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Cliente</TableHead>
-                  <TableHead>Revenda</TableHead>
+                  <TableHead>Parceiro</TableHead>
                   <TableHead className="text-right">Usuários</TableHead>
                   <TableHead>Licenciamento</TableHead>
                   <TableHead className="text-right">Adoção</TableHead>
