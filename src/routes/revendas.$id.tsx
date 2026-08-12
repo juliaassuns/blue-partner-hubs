@@ -4,6 +4,9 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
   PolarAngleAxis,
   PolarGrid,
   Radar,
@@ -70,8 +73,18 @@ function RevendaDetalhe() {
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <KpiCard label="Posição no ranking" valor={`#${posicao}`} />
-        <KpiCard label="Clientes" valor={clientes.length} />
-        <KpiCard label="Contribuição MAICPP" valor={revenda.contribuicaoMaicpp.toFixed(1)} detalhe="pontos" />
+        <KpiCard
+          label="Clientes"
+          valor={clientes.length}
+          detalhe={`${revenda.variacaoClientes3m > 0 ? "+" : ""}${revenda.variacaoClientes3m} (3m)`}
+          tom={revenda.variacaoClientes3m > 0 ? "success" : revenda.variacaoClientes3m < 0 ? "danger" : "default"}
+        />
+        <KpiCard
+          label="Contribuição MAICPP"
+          valor={revenda.contribuicaoMaicpp.toFixed(1)}
+          detalhe={`${revenda.variacaoPontos3m > 0 ? "+" : ""}${revenda.variacaoPontos3m.toFixed(1)} pts (3m)`}
+          tom={revenda.variacaoPontos3m > 0.5 ? "success" : revenda.variacaoPontos3m < -0.5 ? "danger" : "default"}
+        />
         <KpiCard label="Saúde geral" valor={`${revenda.saude}%`} tom={revenda.saude > 70 ? "success" : revenda.saude > 50 ? "warning" : "danger"} />
         <KpiCard label="Potencial de crescimento" valor={`${revenda.potencial}%`} tom="success" />
       </div>
@@ -136,6 +149,27 @@ function RevendaDetalhe() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Evolução da revenda (12 meses)</CardTitle>
+          <CardDescription>Contribuição MAICPP e quantidade de clientes ao longo do tempo</CardDescription>
+        </CardHeader>
+        <CardContent className="h-[280px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={revenda.historico}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="mes" tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} />
+              <YAxis yAxisId="pontos" tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} />
+              <YAxis yAxisId="clientes" orientation="right" tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} allowDecimals={false} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line yAxisId="pontos" type="monotone" dataKey="contribuicaoMaicpp" name="Contribuição MAICPP" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
+              <Line yAxisId="clientes" type="monotone" dataKey="qtdClientes" name="Clientes" stroke="var(--chart-3)" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

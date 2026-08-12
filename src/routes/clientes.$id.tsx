@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
+import { AlertOctagon, ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 
 import { KpiCard, PageHeader, StatusDot } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +44,15 @@ function ClienteDetalhe() {
         descricao={`${cliente.tenant} · ${cliente.segmento}`}
         acoes={<StatusDot status={cliente.status} />}
       />
+
+      {!cliente.contribuindo && (
+        <div className="flex items-center gap-3 rounded border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm">
+          <AlertOctagon className="size-4 shrink-0 text-destructive" />
+          <span>
+            Este cliente parou de contribuir pontos MAICPP em <strong>{cliente.mesParouDePontuar}</strong>.
+          </span>
+        </div>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <KpiCard label="Usuários" valor={cliente.usuarios.toLocaleString("pt-BR")} />

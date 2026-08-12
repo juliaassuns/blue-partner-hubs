@@ -8,7 +8,7 @@ import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
-    ...(process.env.NODE_ENV !== "production" ? [devtools()] : []),
+    ...(process.env["NODE_ENV"] !== "production" ? [devtools()] : []),
     tanstackStart({ server: { entry: "server" } }),
     nitro({ preset: "node-server" }),
     viteReact(),

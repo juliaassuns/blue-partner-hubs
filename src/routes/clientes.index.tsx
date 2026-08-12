@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { clientes, rankingRevendas, totais } from "@/lib/data/dataset";
+import { clientes, clientesQueParamDePontuar, rankingRevendas, totais } from "@/lib/data/dataset";
 
 export const Route = createFileRoute("/clientes/")({
   head: () => ({
@@ -49,7 +49,7 @@ function ClientesIndex() {
       (c) =>
         c.nome.toLowerCase().includes(busca.toLowerCase()) &&
         (revenda === "todas" || c.revendaId === revenda) &&
-        (status === "todos" || c.status === status),
+        (status === "todos" || (status === "Parou de pontuar" ? !c.contribuindo : c.status === status)),
     );
     const sorted = [...filtrados].sort((a, b) => {
       if (ordem === "usuarios") return b.usuarios - a.usuarios;
@@ -63,6 +63,7 @@ function ClientesIndex() {
   const emRisco = clientes.filter((c) => c.status === "Em risco").length;
   const semCopilot = clientes.filter((c) => !c.produtos.includes("Copilot")).length;
   const semDefender = clientes.filter((c) => !c.produtos.includes("Defender")).length;
+  const pararamDePontuar = clientesQueParamDePontuar().length;
 
   return (
     <div className="space-y-6">
@@ -71,9 +72,10 @@ function ClientesIndex() {
         descricao="Drill down por revenda, produtos utilizados e oportunidades detectadas"
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <KpiCard label="Clientes" valor={totais.clientes} detalhe={`${totais.usuariosGerenciados.toLocaleString("pt-BR")} usuários`} />
         <KpiCard label="Em risco" valor={emRisco} tom="danger" />
+        <KpiCard label="Pararam de pontuar" valor={pararamDePontuar} tom="danger" detalhe="últimos 3 meses" />
         <KpiCard label="Sem Copilot" valor={semCopilot} tom="warning" detalhe="oportunidade Modern Work" />
         <KpiCard label="Sem Defender" valor={semDefender} tom="warning" detalhe="oportunidade Security" />
       </div>
@@ -98,7 +100,7 @@ function ClientesIndex() {
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>
-                {["todos", "Ativo", "Renovação próxima", "Em risco"].map((s) => (
+                {["todos", "Ativo", "Renovação próxima", "Em risco", "Parou de pontuar"].map((s) => (
                   <SelectItem key={s} value={s}>{s === "todos" ? "Todos os status" : s}</SelectItem>
                 ))}
               </SelectContent>

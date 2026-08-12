@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AlertTriangle, TrendingUp, Trophy } from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Trophy } from "lucide-react";
 
 import { KpiCard, PageHeader, StatusDot } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -133,6 +133,7 @@ function RevendasIndex() {
                   <TableHead>Segmento</TableHead>
                   <TableHead className="text-right">Clientes</TableHead>
                   <TableHead className="text-right">MAICPP</TableHead>
+                  <TableHead className="text-right">Tendência (3m)</TableHead>
                   <TableHead className="w-36">Saúde</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -151,6 +152,25 @@ function RevendasIndex() {
                     <TableCell><Badge variant="secondary">{r.segmento}</Badge></TableCell>
                     <TableCell className="text-right tabular-nums">{r.qtdClientes}</TableCell>
                     <TableCell className="text-right tabular-nums">{r.contribuicaoMaicpp.toFixed(1)}</TableCell>
+                    <TableCell className="text-right">
+                      <span
+                        className={`inline-flex items-center gap-1 tabular-nums ${
+                          r.variacaoPontos3m > 0.5
+                            ? "text-success"
+                            : r.variacaoPontos3m < -0.5
+                              ? "text-destructive"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        {r.variacaoPontos3m > 0.5 ? (
+                          <TrendingUp className="size-3.5" />
+                        ) : r.variacaoPontos3m < -0.5 ? (
+                          <TrendingDown className="size-3.5" />
+                        ) : null}
+                        {r.variacaoPontos3m > 0 ? "+" : ""}
+                        {r.variacaoPontos3m.toFixed(1)}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <Progress
                         value={r.saude}
@@ -162,7 +182,7 @@ function RevendasIndex() {
                 ))}
                 {lista.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
                       Nenhuma revenda encontrada com os filtros atuais.
                     </TableCell>
                   </TableRow>

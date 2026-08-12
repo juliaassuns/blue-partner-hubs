@@ -138,6 +138,8 @@ const GERENTES = [
   "Gustavo Alves","Helena Castro","Igor Batista","Juliana Moraes","Marcelo Tavares",
 ];
 
+export type PontoHistoricoRevenda = { mes: string; contribuicaoMaicpp: number; qtdClientes: number };
+
 export type Revenda = {
   id: string;
   nome: string;
@@ -152,7 +154,40 @@ export type Revenda = {
   potencial: number;
   receitaMensal: number;
   proximasAcoes: string[];
+  historico: PontoHistoricoRevenda[];
+  variacaoClientes3m: number;
+  variacaoPontos3m: number;
 };
+
+const HOJE_HIST = new Date(2026, 7, 1);
+function mesLabelRevenda(indice: number, total: number) {
+  const d = new Date(HOJE_HIST.getFullYear(), HOJE_HIST.getMonth() - (total - 1 - indice), 1);
+  return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+}
+
+function avg(valores: number[]) {
+  return valores.reduce((s, v) => s + v, 0) / valores.length;
+}
+
+function historicoRevenda(atualPontos: number, atualClientes: number): PontoHistoricoRevenda[] {
+  const meses = 12;
+  const pontos = new Array<number>(meses);
+  const qtdClientesPorMes = new Array<number>(meses);
+  pontos[meses - 1] = atualPontos;
+  qtdClientesPorMes[meses - 1] = atualClientes;
+  for (let i = meses - 2; i >= 0; i--) {
+    const deltaPontos = (rnd() - 0.44) * 1.6;
+    pontos[i] = Math.max(0, Number((pontos[i + 1]! - deltaPontos).toFixed(1)));
+    const sorteioChurn = rnd();
+    const deltaClientes = sorteioChurn < 0.12 ? -1 : sorteioChurn > 0.85 ? 1 : 0;
+    qtdClientesPorMes[i] = Math.max(1, qtdClientesPorMes[i + 1]! - deltaClientes);
+  }
+  return pontos.map((p, i) => ({
+    mes: mesLabelRevenda(i, meses),
+    contribuicaoMaicpp: p,
+    qtdClientes: qtdClientesPorMes[i]!,
+  }));
+}
 
 const CIDADES = ["São Paulo","Campinas","Rio de Janeiro","Belo Horizonte","Curitiba","Porto Alegre","Recife","Salvador","Goiânia","Florianópolis","Brasília","Fortaleza"];
 
@@ -187,6 +222,11 @@ export const revendas: Revenda[] = Array.from({ length: 70 }, (_, i) => {
   );
   const status = pick(STATUS_REVENDA);
   const saude = status === "Inativa" ? int(18, 42) : status === "Atenção" ? int(40, 64) : int(60, 98);
+  const historico = historicoRevenda(contribuicaoMaicpp, qtdClientes);
+  const mediaPontosUltimos3 = avg(historico.slice(-3).map((h) => h.contribuicaoMaicpp));
+  const mediaPontosAnteriores3 = avg(historico.slice(-6, -3).map((h) => h.contribuicaoMaicpp));
+  const mediaClientesUltimos3 = avg(historico.slice(-3).map((h) => h.qtdClientes));
+  const mediaClientesAnteriores3 = avg(historico.slice(-6, -3).map((h) => h.qtdClientes));
   return {
     id: `rev-${String(i + 1).padStart(3, "0")}`,
     nome: nomeRevenda(i),
@@ -201,6 +241,9 @@ export const revendas: Revenda[] = Array.from({ length: 70 }, (_, i) => {
     potencial: int(20, 99),
     receitaMensal: int(18, 480) * 1000,
     proximasAcoes: [pick(ACOES_POOL), pick(ACOES_POOL)].filter((v, idx, a) => a.indexOf(v) === idx),
+    historico,
+    variacaoClientes3m: Math.round(mediaClientesUltimos3 - mediaClientesAnteriores3),
+    variacaoPontos3m: Number((mediaPontosUltimos3 - mediaPontosAnteriores3).toFixed(1)),
   };
 }).sort((a, b) => b.contribuicaoMaicpp - a.contribuicaoMaicpp);
 
@@ -231,7 +274,11 @@ export type Cliente = {
   gapsCriticos: string[];
   scoreOportunidade: number;
   pontosPotenciais: number;
+  contribuindo: boolean;
+  mesParouDePontuar?: string;
 };
+
+const MESES_PARADA = Array.from({ length: 3 }, (_, i) => mesLabelRevenda(9 + i, 12));
 
 const NOMES_CLIENTE = [
   "Grupo Andrade","Farmácia Vitalis","Construtora Norte","Log Brasil","Cooperativa Agroval",
@@ -264,6 +311,8 @@ export const clientes: Cliente[] = revendas.flatMap((rev, ri) =>
     const pontosPotenciais = gaps.reduce((s, g) => s + g.pontos, 0) + extras.length * 3;
     const usuarios = int(12, 2400);
     const status = rnd() > 0.82 ? "Em risco" : rnd() > 0.7 ? "Renovação próxima" : "Ativo";
+    const paradaRoll = rnd();
+    const contribuindo = status === "Em risco" ? paradaRoll > 0.7 : paradaRoll > 0.94;
     return {
       id: `cli-${ri + 1}-${ci + 1}`,
       revendaId: rev.id,
@@ -279,12 +328,16 @@ export const clientes: Cliente[] = revendas.flatMap((rev, ri) =>
       gapsCriticos: [...gaps.map((g) => g.label), ...extras],
       scoreOportunidade: Math.min(100, pontosPotenciais * 3 + int(0, 15)),
       pontosPotenciais,
+      contribuindo,
+      ...(contribuindo ? {} : { mesParouDePontuar: pick(MESES_PARADA) }),
     };
   }),
 );
 
 export const clientesPorRevenda = (revendaId: string) =>
   clientes.filter((c) => c.revendaId === revendaId);
+
+export const clientesQueParamDePontuar = () => clientes.filter((c) => !c.contribuindo);
 
 /* ------------------------------------------------------------------ */
 /* Certificações                                                       */
