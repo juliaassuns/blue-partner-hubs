@@ -11,6 +11,7 @@ import {
   BarChart3,
   Bot,
   Settings,
+  Cloud,
 } from "lucide-react";
 
 import {
@@ -39,6 +40,7 @@ const grupos: { label: string; items: { title: string; url: string; icon: typeof
     items: [
       { title: "Revendas CSP", url: "/revendas", icon: Building2 },
       { title: "Clientes", url: "/clientes", icon: Users },
+      { title: "Clientes (Partner Center)", url: "/clientes-partner-center", icon: Cloud },
     ],
   },
   {

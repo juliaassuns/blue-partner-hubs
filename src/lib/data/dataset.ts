@@ -290,7 +290,7 @@ const NOMES_CLIENTE = [
 
 const LICENCAS = ["M365 Business Premium","M365 E3","M365 E5","M365 Business Standard","Office 365 E1"];
 
-const GAP_RULES: { produto: Produto; label: string; pontos: number }[] = [
+export const GAP_RULES: { produto: Produto; label: string; pontos: number }[] = [
   { produto: "Defender", label: "Sem Defender", pontos: 4 },
   { produto: "Copilot", label: "Sem Copilot", pontos: 6 },
   { produto: "Fabric", label: "Sem Fabric", pontos: 5 },

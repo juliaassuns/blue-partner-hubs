@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BeneficiosRouteImport } from './routes/beneficios'
 import { Route as CertificacoesRouteImport } from './routes/certificacoes'
+import { Route as ClientesPartnerCenterRouteImport } from './routes/clientes-partner-center'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as EspecializacoesRouteImport } from './routes/especializacoes'
@@ -24,6 +25,8 @@ import { Route as RevendasIndexRouteImport } from './routes/revendas.index'
 import { Route as RevendasIdRouteImport } from './routes/revendas.$id'
 import { Route as SolutionsIndexRouteImport } from './routes/solutions.index'
 import { Route as SolutionsAreaRouteImport } from './routes/solutions.$area'
+import { Route as ApiPartnercenterCustomersRouteImport } from './routes/api/partnercenter/customers'
+import { Route as ApiPartnercenterCustomersIdRouteImport } from './routes/api/partnercenter/customers.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -38,6 +41,11 @@ const BeneficiosRoute = BeneficiosRouteImport.update({
 const CertificacoesRoute = CertificacoesRouteImport.update({
   id: '/certificacoes',
   path: '/certificacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientesPartnerCenterRoute = ClientesPartnerCenterRouteImport.update({
+  id: '/clientes-partner-center',
+  path: '/clientes-partner-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
@@ -100,11 +108,24 @@ const SolutionsAreaRoute = SolutionsAreaRouteImport.update({
   path: '/solutions/$area',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPartnercenterCustomersRoute =
+  ApiPartnercenterCustomersRouteImport.update({
+    id: '/api/partnercenter/customers',
+    path: '/api/partnercenter/customers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPartnercenterCustomersIdRoute =
+  ApiPartnercenterCustomersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiPartnercenterCustomersRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/beneficios': typeof BeneficiosRoute
   '/certificacoes': typeof CertificacoesRoute
+  '/clientes-partner-center': typeof ClientesPartnerCenterRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/copilot': typeof CopilotRoute
   '/especializacoes': typeof EspecializacoesRoute
@@ -117,11 +138,14 @@ export interface FileRoutesByFullPath {
   '/clientes/': typeof ClientesIndexRoute
   '/revendas/': typeof RevendasIndexRoute
   '/solutions/': typeof SolutionsIndexRoute
+  '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
+  '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/beneficios': typeof BeneficiosRoute
   '/certificacoes': typeof CertificacoesRoute
+  '/clientes-partner-center': typeof ClientesPartnerCenterRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/copilot': typeof CopilotRoute
   '/especializacoes': typeof EspecializacoesRoute
@@ -134,12 +158,15 @@ export interface FileRoutesByTo {
   '/clientes': typeof ClientesIndexRoute
   '/revendas': typeof RevendasIndexRoute
   '/solutions': typeof SolutionsIndexRoute
+  '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
+  '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/beneficios': typeof BeneficiosRoute
   '/certificacoes': typeof CertificacoesRoute
+  '/clientes-partner-center': typeof ClientesPartnerCenterRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/copilot': typeof CopilotRoute
   '/especializacoes': typeof EspecializacoesRoute
@@ -152,6 +179,8 @@ export interface FileRoutesById {
   '/clientes/': typeof ClientesIndexRoute
   '/revendas/': typeof RevendasIndexRoute
   '/solutions/': typeof SolutionsIndexRoute
+  '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
+  '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/beneficios'
     | '/certificacoes'
+    | '/clientes-partner-center'
     | '/configuracoes'
     | '/copilot'
     | '/especializacoes'
@@ -171,11 +201,14 @@ export interface FileRouteTypes {
     | '/clientes/'
     | '/revendas/'
     | '/solutions/'
+    | '/api/partnercenter/customers'
+    | '/api/partnercenter/customers/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/beneficios'
     | '/certificacoes'
+    | '/clientes-partner-center'
     | '/configuracoes'
     | '/copilot'
     | '/especializacoes'
@@ -188,11 +221,14 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/revendas'
     | '/solutions'
+    | '/api/partnercenter/customers'
+    | '/api/partnercenter/customers/$id'
   id:
     | '__root__'
     | '/'
     | '/beneficios'
     | '/certificacoes'
+    | '/clientes-partner-center'
     | '/configuracoes'
     | '/copilot'
     | '/especializacoes'
@@ -205,12 +241,15 @@ export interface FileRouteTypes {
     | '/clientes/'
     | '/revendas/'
     | '/solutions/'
+    | '/api/partnercenter/customers'
+    | '/api/partnercenter/customers/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BeneficiosRoute: typeof BeneficiosRoute
   CertificacoesRoute: typeof CertificacoesRoute
+  ClientesPartnerCenterRoute: typeof ClientesPartnerCenterRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   CopilotRoute: typeof CopilotRoute
   EspecializacoesRoute: typeof EspecializacoesRoute
@@ -223,6 +262,7 @@ export interface RootRouteChildren {
   ClientesIndexRoute: typeof ClientesIndexRoute
   RevendasIndexRoute: typeof RevendasIndexRoute
   SolutionsIndexRoute: typeof SolutionsIndexRoute
+  ApiPartnercenterCustomersRoute: typeof ApiPartnercenterCustomersRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -246,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/certificacoes'
       fullPath: '/certificacoes'
       preLoaderRoute: typeof CertificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clientes-partner-center': {
+      id: '/clientes-partner-center'
+      path: '/clientes-partner-center'
+      fullPath: '/clientes-partner-center'
+      preLoaderRoute: typeof ClientesPartnerCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/configuracoes': {
@@ -332,13 +379,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsAreaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/partnercenter/customers': {
+      id: '/api/partnercenter/customers'
+      path: '/api/partnercenter/customers'
+      fullPath: '/api/partnercenter/customers'
+      preLoaderRoute: typeof ApiPartnercenterCustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/partnercenter/customers/$id': {
+      id: '/api/partnercenter/customers/$id'
+      path: '/$id'
+      fullPath: '/api/partnercenter/customers/$id'
+      preLoaderRoute: typeof ApiPartnercenterCustomersIdRouteImport
+      parentRoute: typeof ApiPartnercenterCustomersRoute
+    }
   }
 }
+
+interface ApiPartnercenterCustomersRouteChildren {
+  ApiPartnercenterCustomersIdRoute: typeof ApiPartnercenterCustomersIdRoute
+}
+
+const ApiPartnercenterCustomersRouteChildren: ApiPartnercenterCustomersRouteChildren =
+  {
+    ApiPartnercenterCustomersIdRoute: ApiPartnercenterCustomersIdRoute,
+  }
+
+const ApiPartnercenterCustomersRouteWithChildren =
+  ApiPartnercenterCustomersRoute._addFileChildren(
+    ApiPartnercenterCustomersRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BeneficiosRoute: BeneficiosRoute,
   CertificacoesRoute: CertificacoesRoute,
+  ClientesPartnerCenterRoute: ClientesPartnerCenterRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   CopilotRoute: CopilotRoute,
   EspecializacoesRoute: EspecializacoesRoute,
@@ -351,6 +427,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesIndexRoute: ClientesIndexRoute,
   RevendasIndexRoute: RevendasIndexRoute,
   SolutionsIndexRoute: SolutionsIndexRoute,
+  ApiPartnercenterCustomersRoute: ApiPartnercenterCustomersRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
