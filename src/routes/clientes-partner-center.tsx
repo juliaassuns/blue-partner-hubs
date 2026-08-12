@@ -24,7 +24,12 @@ export const Route = createFileRoute("/clientes-partner-center")({
 
 type ClienteReal = { id: string; nome: string; tenant: string };
 type ClientesResponse = { clientes: ClienteReal[]; total: number };
-type GapsResponse = { produtos: string[]; gapsCriticos: string[]; pontosPotenciais: number };
+
+type Assinatura = { nome: string; quantidade: number; status: string; renovacao: string | null; autoRenova: boolean | null };
+type DetalheResponse = {
+  licencas: { ok: true; produtos: string[]; gapsCriticos: string[]; pontosPotenciais: number } | { ok: false; erro: string };
+  assinaturas: { ok: true; itens: Assinatura[] } | { ok: false; erro: string };
+};
 
 async function buscarClientes(): Promise<ClientesResponse> {
   const res = await fetch("/api/partnercenter/customers");
@@ -110,7 +115,7 @@ function ClientesPartnerCenter() {
                       <TableCell className="font-medium">{c.nome}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{c.tenant}</TableCell>
                     </TableRow>
-                    {expandido === c.id && <GapsRow clienteId={c.id} />}
+                    {expandido === c.id && <DetalheRow clienteId={c.id} />}
                   </Fragment>
                 ))}
               </TableBody>
@@ -122,13 +127,13 @@ function ClientesPartnerCenter() {
   );
 }
 
-function GapsRow({ clienteId }: { clienteId: string }) {
+function DetalheRow({ clienteId }: { clienteId: string }) {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["partnercenter-customer-gaps", clienteId],
+    queryKey: ["partnercenter-customer-detalhe", clienteId],
     queryFn: async () => {
       const res = await fetch(`/api/partnercenter/customers/${clienteId}`);
       if (!res.ok) throw new Error(await res.text());
-      return res.json() as Promise<GapsResponse>;
+      return res.json() as Promise<DetalheResponse>;
     },
     retry: false,
   });
@@ -136,40 +141,70 @@ function GapsRow({ clienteId }: { clienteId: string }) {
   return (
     <TableRow>
       <TableCell colSpan={2} className="bg-secondary/30">
-        {isLoading && <p className="text-sm text-muted-foreground">Carregando licenças...</p>}
-        {isError && <p className="text-sm text-destructive">Não foi possível carregar as licenças deste cliente.</p>}
+        {isLoading && <p className="py-2 text-sm text-muted-foreground">Carregando licenças e assinaturas...</p>}
+        {isError && <p className="py-2 text-sm text-destructive">Não foi possível carregar os detalhes deste cliente.</p>}
         {data && (
-          <div className="grid gap-3 py-2 sm:grid-cols-2">
+          <div className="grid gap-4 py-2 sm:grid-cols-2">
             <div>
               <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">Produtos ativos</p>
-              <div className="flex flex-wrap gap-2">
-                {PRODUTOS.map((p) => {
-                  const ativo = data.produtos.includes(p);
-                  return (
-                    <span
-                      key={p}
-                      className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs ${
-                        ativo ? "border-success/30 bg-success/10" : "border-border text-muted-foreground"
-                      }`}
-                    >
-                      {ativo ? <CheckCircle2 className="size-3" /> : <XCircle className="size-3" />} {p}
-                    </span>
-                  );
-                })}
-              </div>
+              {data.licencas.ok ? (
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    {PRODUTOS.map((p) => {
+                      const ativo = data.licencas.ok && data.licencas.produtos.includes(p);
+                      return (
+                        <span
+                          key={p}
+                          className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs ${
+                            ativo ? "border-success/30 bg-success/10" : "border-border text-muted-foreground"
+                          }`}
+                        >
+                          {ativo ? <CheckCircle2 className="size-3" /> : <XCircle className="size-3" />} {p}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  {data.licencas.gapsCriticos.length === 0 ? (
+                    <p className="mt-3 text-sm text-muted-foreground">Nenhum gap crítico detectado.</p>
+                  ) : (
+                    <ul className="mt-3 space-y-1 text-sm">
+                      {data.licencas.gapsCriticos.map((g) => (
+                        <li key={g}>• {g}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="mt-2 text-sm font-semibold text-success">
+                    +{data.licencas.pontosPotenciais} pts MAICPP potenciais
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-destructive">{data.licencas.erro}</p>
+              )}
             </div>
             <div>
-              <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">Gaps e potencial</p>
-              {data.gapsCriticos.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nenhum gap crítico detectado.</p>
+              <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">Assinaturas</p>
+              {data.assinaturas.ok ? (
+                data.assinaturas.itens.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhuma assinatura encontrada.</p>
+                ) : (
+                  <ul className="space-y-2 text-sm">
+                    {data.assinaturas.itens.map((a, i) => (
+                      <li key={i} className="rounded border border-border bg-secondary/30 p-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium">{a.nome}</span>
+                          <Badge variant="secondary">{a.status}</Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {a.quantidade} licenças
+                          {a.renovacao ? ` · renova em ${new Date(a.renovacao).toLocaleDateString("pt-BR")}` : ""}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )
               ) : (
-                <ul className="space-y-1 text-sm">
-                  {data.gapsCriticos.map((g) => (
-                    <li key={g}>• {g}</li>
-                  ))}
-                </ul>
+                <p className="text-sm text-destructive">{data.assinaturas.erro}</p>
               )}
-              <p className="mt-2 text-sm font-semibold text-success">+{data.pontosPotenciais} pts MAICPP potenciais</p>
             </div>
           </div>
         )}
