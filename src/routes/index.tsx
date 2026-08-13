@@ -37,8 +37,10 @@ import {
   totais,
   diasRestantes,
 } from "@/lib/data/dataset";
+import { buscarAreasReais } from "@/lib/maicpp/scores";
 
 export const Route = createFileRoute("/")({
+  loader: () => buscarAreasReais(),
   head: () => ({
     meta: [
       { title: "Dashboard | BluePartner Intelligence Center" },
@@ -67,8 +69,11 @@ const chartColors = [
 ];
 
 function Dashboard() {
-  const radarData = AREAS.map((a) => ({ area: a.nome, pontuacao: a.pontuacao, meta: a.meta }));
+  const areas = Route.useLoaderData();
+  const radarData = areas.map((a) => ({ area: a.nome, pontuacao: a.pontuacao, meta: a.meta }));
   const top10 = rankingRevendas.slice(0, 10);
+  const maicppGlobal = Math.round(areas.reduce((s, a) => s + a.pontuacao, 0) / areas.length);
+  const designacoesAtivas = areas.filter((a) => a.designacao).length;
 
   return (
     <div className="space-y-6">
@@ -82,9 +87,9 @@ function Dashboard() {
         <KpiCard label="Clientes" valor={totais.clientes} detalhe={`${totais.usuariosGerenciados.toLocaleString("pt-BR")} usuários gerenciados`} icone={<Users className="size-4" />} />
         <KpiCard label="Certificações" valor={totais.certificacoes} detalhe={`${totais.certificacoesValidas} válidas · ${totais.certificacoesExpirando} expirando`} icone={<BadgeCheck className="size-4" />} />
         <KpiCard label="Especializações" valor={totais.especializacoes} detalhe={`${totais.especializacoesConquistadas} conquistadas`} icone={<GraduationCap className="size-4" />} />
-        <KpiCard label="Designações" valor={`${totais.designacoes}/6`} detalhe="Solutions Partner ativas" icone={<Award className="size-4" />} tom="success" />
+        <KpiCard label="Designações" valor={`${designacoesAtivas}/6`} detalhe="Solutions Partner ativas" icone={<Award className="size-4" />} tom="success" />
         <KpiCard label="Próximas renovações" valor={totais.proximasRenovacoes} detalhe="áreas com renovação em 180 dias" icone={<CalendarClock className="size-4" />} tom="warning" />
-        <KpiCard label="Pontuação Global MAICPP" valor={`${totais.maicppGlobal}/100`} detalhe="média das seis áreas" icone={<Gauge className="size-4" />} />
+        <KpiCard label="Pontuação Global MAICPP" valor={`${maicppGlobal}/100`} detalhe="média das seis áreas" icone={<Gauge className="size-4" />} />
         <KpiCard label="Potencial de pontos" valor={`+${totais.pontosPotenciais}`} detalhe="oportunidades detectadas na base" icone={<TrendingUp className="size-4" />} tom="success" />
       </div>
 
@@ -145,7 +150,7 @@ function Dashboard() {
           <CardDescription>Clique em uma área para abrir o detalhamento Solutions Partner</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {AREAS.map((a) => {
+          {areas.map((a) => {
             const nivel = semaforo(a.pontuacao, a.meta);
             return (
               <Link

@@ -1,60 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { getPool, sql } from "@/lib/db/client";
+import { buscarAreasReais } from "@/lib/maicpp/scores";
 import { AREAS, type AreaId } from "@/lib/data/dataset";
-
-type LinhaScore = {
-  area_id: string;
-  pontuacao: number;
-  meta: number;
-  performance: number;
-  skilling: number;
-  customer_success: number;
-  designacao: boolean;
-  atualizado_em: Date;
-  atualizado_por: string | null;
-};
 
 export const Route = createFileRoute("/api/maicpp/scores")({
   server: {
     handlers: {
       GET: async () => {
         try {
-          const pool = await getPool();
-          const resultado = await pool.request().query(`SELECT * FROM maicpp_scores`);
-          const salvos = new Map((resultado.recordset as LinhaScore[]).map((l) => [l.area_id, l]));
-
-          const areas = AREAS.map((a) => {
-            const salvo = salvos.get(a.id);
-            return salvo
-              ? {
-                  id: a.id,
-                  nome: a.nome,
-                  pontuacao: salvo.pontuacao,
-                  meta: salvo.meta,
-                  performance: salvo.performance,
-                  skilling: salvo.skilling,
-                  customerSuccess: salvo.customer_success,
-                  designacao: salvo.designacao,
-                  atualizadoEm: salvo.atualizado_em.toISOString(),
-                  atualizadoPor: salvo.atualizado_por,
-                  fonte: "real" as const,
-                }
-              : {
-                  id: a.id,
-                  nome: a.nome,
-                  pontuacao: a.pontuacao,
-                  meta: a.meta,
-                  performance: a.performance,
-                  skilling: a.skilling,
-                  customerSuccess: a.customerSuccess,
-                  designacao: a.designacao,
-                  atualizadoEm: null,
-                  atualizadoPor: null,
-                  fonte: "mock" as const,
-                };
-          });
-
+          const areas = await buscarAreasReais();
           return Response.json({ areas });
         } catch (e) {
           const msg = e instanceof Error ? e.message : "Erro desconhecido";

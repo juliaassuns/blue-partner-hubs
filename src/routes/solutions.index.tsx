@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { PageHeader, ScoreBar, SemaforoBadge } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AREAS, diasRestantes, semaforo } from "@/lib/data/dataset";
+import { diasRestantes, semaforo } from "@/lib/data/dataset";
+import { buscarAreasReais } from "@/lib/maicpp/scores";
 
 export const Route = createFileRoute("/solutions/")({
+  loader: () => buscarAreasReais(),
   head: () => ({
     meta: [
       { title: "Solutions Partner | BluePartner Intelligence Center" },
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/solutions/")({
 });
 
 function SolutionsIndex() {
+  const areas = Route.useLoaderData();
   return (
     <div>
       <PageHeader
@@ -31,7 +34,7 @@ function SolutionsIndex() {
         descricao="Designações Microsoft por área de solução com pontuação MAICPP"
       />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {AREAS.map((a) => {
+        {areas.map((a) => {
           const nivel = semaforo(a.pontuacao, a.meta);
           const dias = diasRestantes(a.renovacao);
           return (

@@ -17,7 +17,6 @@ import { PageHeader, ScoreBar, SemaforoBadge, tooltipStyle } from "@/components/
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  AREAS,
   areaById,
   certificacoes,
   diasRestantes,
@@ -27,21 +26,23 @@ import {
   rankingRevendas,
   semaforo,
 } from "@/lib/data/dataset";
+import { buscarAreasReais } from "@/lib/maicpp/scores";
 
 export const Route = createFileRoute("/solutions/$area")({
-  loader: ({ params }) => {
-    const area = areaById(params.area);
-    if (!area) throw notFound();
-    return { areaNome: area.nome };
+  loader: async ({ params }) => {
+    if (!areaById(params.area)) throw notFound();
+    const areas = await buscarAreasReais();
+    const area = areas.find((a) => a.id === params.area)!;
+    return { area, areas };
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.areaNome ?? "Área"} | Solutions Partner BluePartner` },
+      { title: `${loaderData?.area.nome ?? "Área"} | Solutions Partner BluePartner` },
       {
         name: "description",
-        content: `Pontuação, metas, skilling e recomendações da área ${loaderData?.areaNome ?? ""} no programa Microsoft AI Cloud Partner.`,
+        content: `Pontuação, metas, skilling e recomendações da área ${loaderData?.area.nome ?? ""} no programa Microsoft AI Cloud Partner.`,
       },
-      { property: "og:title", content: `${loaderData?.areaNome ?? "Solutions Partner"} | BluePartner` },
+      { property: "og:title", content: `${loaderData?.area.nome ?? "Solutions Partner"} | BluePartner` },
       {
         property: "og:description",
         content: "Detalhamento de designação Solutions Partner na BluePartner.",
@@ -54,8 +55,7 @@ export const Route = createFileRoute("/solutions/$area")({
 });
 
 function AreaDetalhe() {
-  const { area: areaId } = Route.useParams();
-  const area = areaById(areaId)!;
+  const { area, areas } = Route.useLoaderData();
   const nivel = semaforo(area.pontuacao, area.meta);
   const dias = diasRestantes(area.renovacao);
   const faltam = Math.max(0, area.meta - area.pontuacao);
@@ -218,7 +218,7 @@ function AreaDetalhe() {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        {AREAS.filter((a) => a.id !== area.id).map((a) => (
+        {areas.filter((a) => a.id !== area.id).map((a) => (
           <Link key={a.id} to="/solutions/$area" params={{ area: a.id }}>
             <Badge variant="outline" className="cursor-pointer hover:border-primary">
               {a.nome}
