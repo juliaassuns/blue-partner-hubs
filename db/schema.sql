@@ -25,6 +25,19 @@ CREATE TABLE snapshots (
   CONSTRAINT uq_snapshot UNIQUE (customer_id, data_snapshot)
 );
 
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'maicpp_scores')
+CREATE TABLE maicpp_scores (
+  area_id NVARCHAR(50) PRIMARY KEY,
+  pontuacao INT NOT NULL,
+  meta INT NOT NULL,
+  performance INT NOT NULL,
+  skilling INT NOT NULL,
+  customer_success INT NOT NULL,
+  designacao BIT NOT NULL DEFAULT 0,
+  atualizado_em DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+  atualizado_por NVARCHAR(200) NULL
+);
+
 -- Permite que a Web App (Managed Identity) leia/escreva sem ser admin do servidor.
 IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'app-bluepartner-hub')
 BEGIN

@@ -25,6 +25,7 @@ import { Route as RevendasIndexRouteImport } from './routes/revendas.index'
 import { Route as RevendasIdRouteImport } from './routes/revendas.$id'
 import { Route as SolutionsIndexRouteImport } from './routes/solutions.index'
 import { Route as SolutionsAreaRouteImport } from './routes/solutions.$area'
+import { Route as ApiMaicppScoresRouteImport } from './routes/api/maicpp/scores'
 import { Route as ApiPartnercenterCustomersRouteImport } from './routes/api/partnercenter/customers'
 import { Route as ApiPartnercenterCustomersIdRouteImport } from './routes/api/partnercenter/customers.$id'
 import { Route as ApiPartnercenterHistoricoIdRouteImport } from './routes/api/partnercenter/historico.$id'
@@ -109,6 +110,11 @@ const SolutionsAreaRoute = SolutionsAreaRouteImport.update({
   path: '/solutions/$area',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMaicppScoresRoute = ApiMaicppScoresRouteImport.update({
+  id: '/api/maicpp/scores',
+  path: '/api/maicpp/scores',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPartnercenterCustomersRoute =
   ApiPartnercenterCustomersRouteImport.update({
     id: '/api/partnercenter/customers',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/clientes/': typeof ClientesIndexRoute
   '/revendas/': typeof RevendasIndexRoute
   '/solutions/': typeof SolutionsIndexRoute
+  '/api/maicpp/scores': typeof ApiMaicppScoresRoute
   '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
   '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
   '/api/partnercenter/historico/$id': typeof ApiPartnercenterHistoricoIdRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof ClientesIndexRoute
   '/revendas': typeof RevendasIndexRoute
   '/solutions': typeof SolutionsIndexRoute
+  '/api/maicpp/scores': typeof ApiMaicppScoresRoute
   '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
   '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
   '/api/partnercenter/historico/$id': typeof ApiPartnercenterHistoricoIdRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/clientes/': typeof ClientesIndexRoute
   '/revendas/': typeof RevendasIndexRoute
   '/solutions/': typeof SolutionsIndexRoute
+  '/api/maicpp/scores': typeof ApiMaicppScoresRoute
   '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
   '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
   '/api/partnercenter/historico/$id': typeof ApiPartnercenterHistoricoIdRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/clientes/'
     | '/revendas/'
     | '/solutions/'
+    | '/api/maicpp/scores'
     | '/api/partnercenter/customers'
     | '/api/partnercenter/customers/$id'
     | '/api/partnercenter/historico/$id'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/revendas'
     | '/solutions'
+    | '/api/maicpp/scores'
     | '/api/partnercenter/customers'
     | '/api/partnercenter/customers/$id'
     | '/api/partnercenter/historico/$id'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/clientes/'
     | '/revendas/'
     | '/solutions/'
+    | '/api/maicpp/scores'
     | '/api/partnercenter/customers'
     | '/api/partnercenter/customers/$id'
     | '/api/partnercenter/historico/$id'
@@ -275,6 +287,7 @@ export interface RootRouteChildren {
   ClientesIndexRoute: typeof ClientesIndexRoute
   RevendasIndexRoute: typeof RevendasIndexRoute
   SolutionsIndexRoute: typeof SolutionsIndexRoute
+  ApiMaicppScoresRoute: typeof ApiMaicppScoresRoute
   ApiPartnercenterCustomersRoute: typeof ApiPartnercenterCustomersRouteWithChildren
   ApiPartnercenterHistoricoIdRoute: typeof ApiPartnercenterHistoricoIdRoute
 }
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsAreaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/maicpp/scores': {
+      id: '/api/maicpp/scores'
+      path: '/api/maicpp/scores'
+      fullPath: '/api/maicpp/scores'
+      preLoaderRoute: typeof ApiMaicppScoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/partnercenter/customers': {
       id: '/api/partnercenter/customers'
       path: '/api/partnercenter/customers'
@@ -448,6 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesIndexRoute: ClientesIndexRoute,
   RevendasIndexRoute: RevendasIndexRoute,
   SolutionsIndexRoute: SolutionsIndexRoute,
+  ApiMaicppScoresRoute: ApiMaicppScoresRoute,
   ApiPartnercenterCustomersRoute: ApiPartnercenterCustomersRouteWithChildren,
   ApiPartnercenterHistoricoIdRoute: ApiPartnercenterHistoricoIdRoute,
 }
