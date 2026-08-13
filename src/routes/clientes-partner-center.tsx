@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment, useState } from "react";
 import { CheckCircle2, Cloud, XCircle } from "lucide-react";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { KpiCard, PageHeader } from "@/components/ui-kit";
+import { KpiCard, PageHeader, tooltipStyle } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -208,7 +209,44 @@ function DetalheRow({ clienteId }: { clienteId: string }) {
             </div>
           </div>
         )}
+        {data && <EvolucaoCliente clienteId={clienteId} />}
       </TableCell>
     </TableRow>
+  );
+}
+
+type PontoHistorico = { data: string; produtosAtivos: number; pontosPotenciais: number };
+
+function EvolucaoCliente({ clienteId }: { clienteId: string }) {
+  const { data } = useQuery({
+    queryKey: ["partnercenter-historico", clienteId],
+    queryFn: async () => {
+      const res = await fetch(`/api/partnercenter/historico/${clienteId}`);
+      if (!res.ok) throw new Error(await res.text());
+      return res.json() as Promise<{ pontos: PontoHistorico[] }>;
+    },
+    retry: false,
+  });
+
+  if (!data || data.pontos.length < 2) return null;
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">
+        Evolução ({data.pontos.length} snapshots)
+      </p>
+      <div className="h-[180px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data.pontos}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="data" tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} />
+            <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} allowDecimals={false} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Line type="monotone" dataKey="produtosAtivos" name="Produtos ativos" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="pontosPotenciais" name="Pts MAICPP potenciais" stroke="var(--chart-3)" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   );
 }

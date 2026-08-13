@@ -20,6 +20,16 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - run: bun run build
+      - run: bun run build:webjob
+
+      - name: Montar pacote de deploy (app + WebJob)
+        run: |
+          mkdir -p deploy
+          cp -r .output/* deploy/
+          mkdir -p deploy/App_Data/jobs/triggered/pc-snapshot
+          cp webjob-dist/pc-snapshot/run.js deploy/App_Data/jobs/triggered/pc-snapshot/
+          cp webjob/pc-snapshot/settings.job deploy/App_Data/jobs/triggered/pc-snapshot/
+          cp webjob/pc-snapshot/package.json deploy/App_Data/jobs/triggered/pc-snapshot/
 
       - name: Azure login (OIDC)
         uses: azure/login@v2
@@ -32,4 +42,4 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: app-bluepartner-hub
-          package: .output
+          package: deploy

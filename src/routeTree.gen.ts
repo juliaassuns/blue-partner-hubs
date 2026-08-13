@@ -27,6 +27,7 @@ import { Route as SolutionsIndexRouteImport } from './routes/solutions.index'
 import { Route as SolutionsAreaRouteImport } from './routes/solutions.$area'
 import { Route as ApiPartnercenterCustomersRouteImport } from './routes/api/partnercenter/customers'
 import { Route as ApiPartnercenterCustomersIdRouteImport } from './routes/api/partnercenter/customers.$id'
+import { Route as ApiPartnercenterHistoricoIdRouteImport } from './routes/api/partnercenter/historico.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -120,6 +121,12 @@ const ApiPartnercenterCustomersIdRoute =
     path: '/$id',
     getParentRoute: () => ApiPartnercenterCustomersRoute,
   } as any)
+const ApiPartnercenterHistoricoIdRoute =
+  ApiPartnercenterHistoricoIdRouteImport.update({
+    id: '/api/partnercenter/historico/$id',
+    path: '/api/partnercenter/historico/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/solutions/': typeof SolutionsIndexRoute
   '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
   '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
+  '/api/partnercenter/historico/$id': typeof ApiPartnercenterHistoricoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -160,6 +168,7 @@ export interface FileRoutesByTo {
   '/solutions': typeof SolutionsIndexRoute
   '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
   '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
+  '/api/partnercenter/historico/$id': typeof ApiPartnercenterHistoricoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -181,6 +190,7 @@ export interface FileRoutesById {
   '/solutions/': typeof SolutionsIndexRoute
   '/api/partnercenter/customers': typeof ApiPartnercenterCustomersRouteWithChildren
   '/api/partnercenter/customers/$id': typeof ApiPartnercenterCustomersIdRoute
+  '/api/partnercenter/historico/$id': typeof ApiPartnercenterHistoricoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/solutions/'
     | '/api/partnercenter/customers'
     | '/api/partnercenter/customers/$id'
+    | '/api/partnercenter/historico/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/solutions'
     | '/api/partnercenter/customers'
     | '/api/partnercenter/customers/$id'
+    | '/api/partnercenter/historico/$id'
   id:
     | '__root__'
     | '/'
@@ -243,6 +255,7 @@ export interface FileRouteTypes {
     | '/solutions/'
     | '/api/partnercenter/customers'
     | '/api/partnercenter/customers/$id'
+    | '/api/partnercenter/historico/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -263,6 +276,7 @@ export interface RootRouteChildren {
   RevendasIndexRoute: typeof RevendasIndexRoute
   SolutionsIndexRoute: typeof SolutionsIndexRoute
   ApiPartnercenterCustomersRoute: typeof ApiPartnercenterCustomersRouteWithChildren
+  ApiPartnercenterHistoricoIdRoute: typeof ApiPartnercenterHistoricoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -393,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPartnercenterCustomersIdRouteImport
       parentRoute: typeof ApiPartnercenterCustomersRoute
     }
+    '/api/partnercenter/historico/$id': {
+      id: '/api/partnercenter/historico/$id'
+      path: '/api/partnercenter/historico/$id'
+      fullPath: '/api/partnercenter/historico/$id'
+      preLoaderRoute: typeof ApiPartnercenterHistoricoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -428,6 +449,7 @@ const rootRouteChildren: RootRouteChildren = {
   RevendasIndexRoute: RevendasIndexRoute,
   SolutionsIndexRoute: SolutionsIndexRoute,
   ApiPartnercenterCustomersRoute: ApiPartnercenterCustomersRouteWithChildren,
+  ApiPartnercenterHistoricoIdRoute: ApiPartnercenterHistoricoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
