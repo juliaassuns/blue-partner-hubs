@@ -22,9 +22,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { rankingRevendas } from "@/lib/data/dataset";
+import { buscarRevendasReais, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/revendas/")({
+  loader: async () => {
+    const { dados } = await buscarRevendasReais();
+    return { ranking: ranquear(dados) };
+  },
   head: () => ({
     meta: [
       { title: "Parceiros MAICPP | BluePartner Intelligence Center" },
@@ -41,6 +45,7 @@ export const Route = createFileRoute("/revendas/")({
 });
 
 function RevendasIndex() {
+  const { ranking: rankingRevendas } = Route.useLoaderData();
   const [busca, setBusca] = useState("");
   const [status, setStatus] = useState("todos");
   const [segmento, setSegmento] = useState("todos");

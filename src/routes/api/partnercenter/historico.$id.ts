@@ -8,10 +8,15 @@ type LinhaHistorico = {
   pontos_potenciais: number | null;
 };
 
+const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const Route = createFileRoute("/api/partnercenter/historico/$id")({
   server: {
     handlers: {
       GET: async ({ params }) => {
+        if (!GUID.test(params.id)) {
+          return new Response("id de cliente inválido", { status: 400 });
+        }
         try {
           const pool = await getPool();
           const resultado = await pool

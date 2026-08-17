@@ -20,9 +20,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { clientes, clientesQueParamDePontuar, rankingRevendas, totais } from "@/lib/data/dataset";
+import { buscarClientesReais, buscarRevendasReais, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/clientes/")({
+  loader: async () => {
+    const [revendasData, clientesData] = await Promise.all([buscarRevendasReais(), buscarClientesReais()]);
+    return { clientes: clientesData.dados, rankingRevendas: ranquear(revendasData.dados) };
+  },
   head: () => ({
     meta: [
       { title: "Clientes | BluePartner Intelligence Center" },
@@ -39,6 +43,7 @@ export const Route = createFileRoute("/clientes/")({
 });
 
 function ClientesIndex() {
+  const { clientes, rankingRevendas } = Route.useLoaderData();
   const [busca, setBusca] = useState("");
   const [revenda, setRevenda] = useState("todas");
   const [status, setStatus] = useState("todos");
@@ -63,7 +68,8 @@ function ClientesIndex() {
   const emRisco = clientes.filter((c) => c.status === "Em risco").length;
   const semCopilot = clientes.filter((c) => !c.produtos.includes("Copilot")).length;
   const semDefender = clientes.filter((c) => !c.produtos.includes("Defender")).length;
-  const pararamDePontuar = clientesQueParamDePontuar().length;
+  const pararamDePontuar = clientes.filter((c) => !c.contribuindo).length;
+  const usuariosGerenciados = clientes.reduce((s, c) => s + c.usuarios, 0);
 
   return (
     <div className="space-y-6">
@@ -73,7 +79,7 @@ function ClientesIndex() {
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <KpiCard label="Clientes" valor={totais.clientes} detalhe={`${totais.usuariosGerenciados.toLocaleString("pt-BR")} usuários`} />
+        <KpiCard label="Clientes" valor={clientes.length} detalhe={`${usuariosGerenciados.toLocaleString("pt-BR")} usuários`} />
         <KpiCard label="Em risco" valor={emRisco} tom="danger" />
         <KpiCard label="Pararam de pontuar" valor={pararamDePontuar} tom="danger" detalhe="últimos 3 meses" />
         <KpiCard label="Sem Copilot" valor={semCopilot} tom="warning" detalhe="oportunidade Modern Work" />

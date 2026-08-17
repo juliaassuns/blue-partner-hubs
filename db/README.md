@@ -18,6 +18,17 @@ node db/apply-schema.mjs
 az sql server firewall-rule delete --server sql-bph-2026 --resource-group rg-bluepartner-hub --name AllowLocalSetup
 ```
 
+## Semear parceiros MAICPP e clientes (uma vez, ou pra atualizar o snapshot)
+
+Carrega as tabelas `revendas`/`clientes` a partir do dataset mockado em
+`src/lib/data/dataset.ts`. Depois disso, `/`, `/revendas` e `/clientes` passam
+a ler do banco (com fallback automático pro mock se o banco cair). Mesmo
+requisito de firewall/IP do passo acima:
+
+```sh
+SQL_SERVER=sql-bph-2026.database.windows.net SQL_DATABASE=bluepartner bun run db/seed-revendas.ts
+```
+
 ## Testar o WebJob de snapshot localmente
 
 ```sh

@@ -5,13 +5,16 @@ import { KpiCard, PageHeader, StatusDot } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { clienteById, PRODUTOS, revendaById } from "@/lib/data/dataset";
+import { PRODUTOS } from "@/lib/data/dataset";
+import { buscarClientesReais, buscarRevendasReais } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/clientes/$id")({
-  loader: ({ params }) => {
-    const cliente = clienteById(params.id);
+  loader: async ({ params }) => {
+    const [revendasData, clientesData] = await Promise.all([buscarRevendasReais(), buscarClientesReais()]);
+    const cliente = clientesData.dados.find((c) => c.id === params.id);
     if (!cliente) throw notFound();
-    return { nome: cliente.nome };
+    const revenda = revendasData.dados.find((r) => r.id === cliente.revendaId)!;
+    return { cliente, revenda, nome: cliente.nome };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -30,9 +33,7 @@ export const Route = createFileRoute("/clientes/$id")({
 });
 
 function ClienteDetalhe() {
-  const { id } = Route.useParams();
-  const cliente = clienteById(id)!;
-  const revenda = revendaById(cliente.revendaId)!;
+  const { cliente, revenda } = Route.useLoaderData();
 
   return (
     <div className="space-y-6">

@@ -29,18 +29,26 @@ import {
 
 import { KpiCard, PageHeader, ScoreBar, SemaforoBadge, tooltipStyle } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  AREAS,
-  historico,
-  rankingRevendas,
-  semaforo,
-  totais,
-  diasRestantes,
-} from "@/lib/data/dataset";
+import { AREAS, historico, semaforo, totais, diasRestantes } from "@/lib/data/dataset";
 import { buscarAreasReais } from "@/lib/maicpp/scores";
+import { buscarClientesReais, buscarRevendasReais, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/")({
-  loader: () => buscarAreasReais(),
+  loader: async () => {
+    const [areas, revendasData, clientesData] = await Promise.all([
+      buscarAreasReais(),
+      buscarRevendasReais(),
+      buscarClientesReais(),
+    ]);
+    return {
+      areas,
+      rankingRevendas: ranquear(revendasData.dados),
+      totalRevendas: revendasData.dados.length,
+      totalClientes: clientesData.dados.length,
+      usuariosGerenciados: clientesData.dados.reduce((s, c) => s + c.usuarios, 0),
+      pontosPotenciais: clientesData.dados.reduce((s, c) => s + c.pontosPotenciais, 0),
+    };
+  },
   head: () => ({
     meta: [
       { title: "Dashboard | BluePartner Intelligence Center" },
@@ -69,7 +77,8 @@ const chartColors = [
 ];
 
 function Dashboard() {
-  const areas = Route.useLoaderData();
+  const { areas, rankingRevendas, totalRevendas, totalClientes, usuariosGerenciados, pontosPotenciais } =
+    Route.useLoaderData();
   const radarData = areas.map((a) => ({ area: a.nome, pontuacao: a.pontuacao, meta: a.meta }));
   const top10 = rankingRevendas.slice(0, 10);
   const maicppGlobal = Math.round(areas.reduce((s, a) => s + a.pontuacao, 0) / areas.length);
@@ -83,14 +92,14 @@ function Dashboard() {
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Parceiros MAICPP" valor={totais.revendas} detalhe="parceiros ativos no programa" icone={<Building2 className="size-4" />} />
-        <KpiCard label="Clientes" valor={totais.clientes} detalhe={`${totais.usuariosGerenciados.toLocaleString("pt-BR")} usuários gerenciados`} icone={<Users className="size-4" />} />
+        <KpiCard label="Parceiros MAICPP" valor={totalRevendas} detalhe="parceiros ativos no programa" icone={<Building2 className="size-4" />} />
+        <KpiCard label="Clientes" valor={totalClientes} detalhe={`${usuariosGerenciados.toLocaleString("pt-BR")} usuários gerenciados`} icone={<Users className="size-4" />} />
         <KpiCard label="Certificações" valor={totais.certificacoes} detalhe={`${totais.certificacoesValidas} válidas · ${totais.certificacoesExpirando} expirando`} icone={<BadgeCheck className="size-4" />} />
         <KpiCard label="Especializações" valor={totais.especializacoes} detalhe={`${totais.especializacoesConquistadas} conquistadas`} icone={<GraduationCap className="size-4" />} />
         <KpiCard label="Designações" valor={`${designacoesAtivas}/6`} detalhe="Solutions Partner ativas" icone={<Award className="size-4" />} tom="success" />
         <KpiCard label="Próximas renovações" valor={totais.proximasRenovacoes} detalhe="áreas com renovação em 180 dias" icone={<CalendarClock className="size-4" />} tom="warning" />
         <KpiCard label="Pontuação Global MAICPP" valor={`${maicppGlobal}/100`} detalhe="média das seis áreas" icone={<Gauge className="size-4" />} />
-        <KpiCard label="Potencial de pontos" valor={`+${totais.pontosPotenciais}`} detalhe="oportunidades detectadas na base" icone={<TrendingUp className="size-4" />} tom="success" />
+        <KpiCard label="Potencial de pontos" valor={`+${pontosPotenciais}`} detalhe="oportunidades detectadas na base" icone={<TrendingUp className="size-4" />} tom="success" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
