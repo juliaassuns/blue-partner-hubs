@@ -1,6 +1,8 @@
 // Pontuação MAICPP real (Azure SQL), com fallback pros valores mockados de
 // AREAS quando uma área ainda não foi salva ou o banco está indisponível —
 // páginas nunca quebram por causa disso, só mostram o valor de referência.
+import { createServerFn } from "@tanstack/react-start";
+
 import { getPool } from "@/lib/db/client";
 import { AREAS, type Area } from "@/lib/data/dataset";
 
@@ -49,3 +51,11 @@ export async function buscarAreasReais(): Promise<AreaReal[]> {
     return AREAS.map((a) => ({ ...a, atualizadoEm: null, atualizadoPor: null, fonte: "mock" as const }));
   }
 }
+
+// Wrapper server-only: chamado a partir de `loader`s de rota, que também
+// rodam durante navegação client-side. Sem isso, o driver do SQL (que usa
+// APIs só de Node, ex. Buffer) vaza pro bundle do navegador e quebra o app
+// inteiro com "Buffer is not defined".
+export const buscarAreasReaisServerFn = createServerFn({ method: "GET" }).handler(async () => {
+  return buscarAreasReais();
+});

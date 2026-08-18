@@ -20,11 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { buscarClientesReais, buscarRevendasReais, ranquear } from "@/lib/revendas/data";
+import { buscarClientesReaisServerFn, buscarRevendasReaisServerFn, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/clientes/")({
   loader: async () => {
-    const [revendasData, clientesData] = await Promise.all([buscarRevendasReais(), buscarClientesReais()]);
+    const [revendasData, clientesData] = await Promise.all([
+      buscarRevendasReaisServerFn(),
+      buscarClientesReaisServerFn(),
+    ]);
     return { clientes: clientesData.dados, rankingRevendas: ranquear(revendasData.dados) };
   },
   head: () => ({

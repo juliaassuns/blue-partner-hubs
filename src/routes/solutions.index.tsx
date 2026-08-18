@@ -3,10 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, ScoreBar, SemaforoBadge } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { diasRestantes, semaforo } from "@/lib/data/dataset";
-import { buscarAreasReais } from "@/lib/maicpp/scores";
+import { buscarAreasReaisServerFn } from "@/lib/maicpp/scores";
 
 export const Route = createFileRoute("/solutions/")({
-  loader: () => buscarAreasReais(),
+  loader: () => buscarAreasReaisServerFn(),
   head: () => ({
     meta: [
       { title: "Solutions Partner | BluePartner Intelligence Center" },

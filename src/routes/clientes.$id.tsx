@@ -6,11 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PRODUTOS } from "@/lib/data/dataset";
-import { buscarClientesReais, buscarRevendasReais } from "@/lib/revendas/data";
+import { buscarClientesReaisServerFn, buscarRevendasReaisServerFn } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/clientes/$id")({
   loader: async ({ params }) => {
-    const [revendasData, clientesData] = await Promise.all([buscarRevendasReais(), buscarClientesReais()]);
+    const [revendasData, clientesData] = await Promise.all([
+      buscarRevendasReaisServerFn(),
+      buscarClientesReaisServerFn(),
+    ]);
     const cliente = clientesData.dados.find((c) => c.id === params.id);
     if (!cliente) throw notFound();
     const revenda = revendasData.dados.find((r) => r.id === cliente.revendaId)!;

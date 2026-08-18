@@ -22,11 +22,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { buscarRevendasReais, ranquear } from "@/lib/revendas/data";
+import { buscarRevendasReaisServerFn, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/revendas/")({
   loader: async () => {
-    const { dados } = await buscarRevendasReais();
+    const { dados } = await buscarRevendasReaisServerFn();
     return { ranking: ranquear(dados) };
   },
   head: () => ({

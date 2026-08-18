@@ -26,12 +26,12 @@ import {
   rankingRevendas,
   semaforo,
 } from "@/lib/data/dataset";
-import { buscarAreasReais } from "@/lib/maicpp/scores";
+import { buscarAreasReaisServerFn } from "@/lib/maicpp/scores";
 
 export const Route = createFileRoute("/solutions/$area")({
   loader: async ({ params }) => {
     if (!areaById(params.area)) throw notFound();
-    const areas = await buscarAreasReais();
+    const areas = await buscarAreasReaisServerFn();
     const area = areas.find((a) => a.id === params.area)!;
     return { area, areas };
   },

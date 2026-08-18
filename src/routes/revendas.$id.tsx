@@ -31,11 +31,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AREAS, semaforo, type Metrica } from "@/lib/data/dataset";
-import { buscarClientesReais, buscarRevendasReais, ranquear } from "@/lib/revendas/data";
+import { buscarClientesReaisServerFn, buscarRevendasReaisServerFn, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/revendas/$id")({
   loader: async ({ params }) => {
-    const [revendasData, clientesData] = await Promise.all([buscarRevendasReais(), buscarClientesReais()]);
+    const [revendasData, clientesData] = await Promise.all([
+      buscarRevendasReaisServerFn(),
+      buscarClientesReaisServerFn(),
+    ]);
     const revenda = revendasData.dados.find((r) => r.id === params.id);
     if (!revenda) throw notFound();
     const posicao = ranquear(revendasData.dados).find((r) => r.id === params.id)?.posicao ?? 0;

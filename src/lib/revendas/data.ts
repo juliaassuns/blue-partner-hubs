@@ -1,6 +1,8 @@
 // Parceiros MAICPP (revendas) e clientes reais (Azure SQL), com fallback pro
 // dataset mockado quando o banco ainda não foi semeado ou está indisponível —
 // mesmo princípio de src/lib/maicpp/scores.ts, páginas nunca quebram por isso.
+import { createServerFn } from "@tanstack/react-start";
+
 import { getPool } from "@/lib/db/client";
 import {
   revendas as revendasMock,
@@ -127,3 +129,15 @@ export type RevendaRankeada = Revenda & { posicao: number };
 export function ranquear(revendas: Revenda[]): RevendaRankeada[] {
   return revendas.map((r, i) => ({ ...r, posicao: i + 1 }));
 }
+
+// Wrappers server-only: chamados a partir de `loader`s de rota, que também
+// rodam durante navegação client-side. Sem isso, o driver do SQL (que usa
+// APIs só de Node, ex. Buffer) vaza pro bundle do navegador e quebra o app
+// inteiro com "Buffer is not defined".
+export const buscarRevendasReaisServerFn = createServerFn({ method: "GET" }).handler(async () => {
+  return buscarRevendasReais();
+});
+
+export const buscarClientesReaisServerFn = createServerFn({ method: "GET" }).handler(async () => {
+  return buscarClientesReais();
+});

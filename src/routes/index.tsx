@@ -30,15 +30,15 @@ import {
 import { KpiCard, PageHeader, ScoreBar, SemaforoBadge, tooltipStyle } from "@/components/ui-kit";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AREAS, historico, semaforo, totais, diasRestantes } from "@/lib/data/dataset";
-import { buscarAreasReais } from "@/lib/maicpp/scores";
-import { buscarClientesReais, buscarRevendasReais, ranquear } from "@/lib/revendas/data";
+import { buscarAreasReaisServerFn } from "@/lib/maicpp/scores";
+import { buscarClientesReaisServerFn, buscarRevendasReaisServerFn, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [areas, revendasData, clientesData] = await Promise.all([
-      buscarAreasReais(),
-      buscarRevendasReais(),
-      buscarClientesReais(),
+      buscarAreasReaisServerFn(),
+      buscarRevendasReaisServerFn(),
+      buscarClientesReaisServerFn(),
     ]);
     return {
       areas,
