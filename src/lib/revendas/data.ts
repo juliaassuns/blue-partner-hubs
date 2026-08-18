@@ -8,7 +8,7 @@ import {
   type Revenda,
   type Cliente,
   type AreaId,
-  type Area,
+  type AreaRevenda,
   type Produto,
   type PontoHistoricoRevenda,
 } from "@/lib/data/dataset";
@@ -70,7 +70,7 @@ function mapRevenda(l: LinhaRevenda): Revenda {
     historico: JSON.parse(l.historico) as PontoHistoricoRevenda[],
     variacaoClientes3m: l.variacao_clientes_3m,
     variacaoPontos3m: l.variacao_pontos_3m,
-    areas: JSON.parse(l.areas) as Record<AreaId, Area>,
+    areas: JSON.parse(l.areas) as Record<AreaId, AreaRevenda>,
   };
 }
 

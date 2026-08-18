@@ -17,7 +17,8 @@ import {
   YAxis,
 } from "recharts";
 
-import { KpiCard, PageHeader, ScoreBar, SemaforoBadge, StatusDot, tooltipStyle } from "@/components/ui-kit";
+import { KpiCard, PageHeader, SemaforoBadge, StatusDot, tooltipStyle } from "@/components/ui-kit";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -29,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AREAS, diasRestantes, semaforo } from "@/lib/data/dataset";
+import { AREAS, semaforo, type Metrica } from "@/lib/data/dataset";
 import { buscarClientesReais, buscarRevendasReais, ranquear } from "@/lib/revendas/data";
 
 export const Route = createFileRoute("/revendas/$id")({
@@ -93,36 +94,43 @@ function RevendaDetalhe() {
       <Card>
         <CardHeader>
           <CardTitle>Solutions Partner do parceiro</CardTitle>
-          <CardDescription>Pontuação própria deste parceiro por área e metas para novas designações</CardDescription>
+          <CardDescription>
+            Detalhamento por métrica de Performance, Skilling e Customer Success — mesmo formato do painel oficial do Partner Center
+          </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {AREAS.map((a) => {
-            const areaRevenda = revenda.areas[a.id];
-            const nivel = semaforo(areaRevenda.pontuacao, areaRevenda.meta);
-            return (
-              <div key={a.id} className="rounded-md border border-border bg-secondary/30 p-4">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <span className="font-medium">{areaRevenda.nome}</span>
-                  <SemaforoBadge nivel={nivel} />
-                </div>
-                <p className="mb-2 text-2xl font-semibold tabular-nums">
-                  {areaRevenda.pontuacao}
-                  <span className="text-sm text-muted-foreground">/{areaRevenda.meta}</span>
-                </p>
-                <ScoreBar valor={areaRevenda.pontuacao} meta={areaRevenda.meta} nivel={nivel} />
-                <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>
-                    Perf. {areaRevenda.performance} · Skilling {areaRevenda.skilling} · CS {areaRevenda.customerSuccess}
-                  </span>
-                  {areaRevenda.designacao ? (
-                    <Badge variant="outline" className="border-success/40 text-success">designação ativa</Badge>
-                  ) : (
-                    <span>renova em {diasRestantes(areaRevenda.renovacao)}d</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <CardContent className="px-3">
+          <Accordion type="multiple" defaultValue={[AREAS[0]!.id]}>
+            {AREAS.map((a) => {
+              const areaRevenda = revenda.areas[a.id];
+              const nivel = semaforo(areaRevenda.pontuacao, areaRevenda.meta);
+              return (
+                <AccordionItem key={a.id} value={a.id}>
+                  <AccordionTrigger className="px-3">
+                    <div className="flex w-full flex-wrap items-center justify-between gap-3 pr-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-medium">{areaRevenda.nome}</span>
+                        <Badge variant="outline" className="text-xs">{areaRevenda.segmento}</Badge>
+                        <SemaforoBadge nivel={nivel} />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground tabular-nums">
+                          {areaRevenda.pontuacao}/{areaRevenda.meta} pts
+                        </span>
+                        {areaRevenda.designacao ? (
+                          <Badge className="bg-success/15 text-success hover:bg-success/15">Qualified</Badge>
+                        ) : (
+                          <Badge variant="outline" className="border-warning/40 text-warning">In Progress</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-3">
+                    <MetricasPorCategoria metricas={areaRevenda.metricas} />
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </CardContent>
       </Card>
 
@@ -248,6 +256,53 @@ function RevendaDetalhe() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+const CATEGORIAS: { titulo: string; chave: Metrica["categoria"] }[] = [
+  { titulo: "1. Performance", chave: "performance" },
+  { titulo: "2. Skilling", chave: "skilling" },
+  { titulo: "3. Customer success", chave: "customerSuccess" },
+];
+
+function MetricasPorCategoria({ metricas }: { metricas: Metrica[] }) {
+  return (
+    <div className="space-y-5">
+      {CATEGORIAS.map((cat) => (
+        <div key={cat.chave}>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{cat.titulo}</p>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {metricas
+              .filter((m) => m.categoria === cat.chave)
+              .map((m) => (
+                <div key={m.nome} className="rounded-md border border-border bg-secondary/30 p-3">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <Badge
+                      variant="outline"
+                      className={
+                        m.status === "Achieved"
+                          ? "border-success/40 text-success"
+                          : "border-primary/40 text-primary"
+                      }
+                    >
+                      {m.status}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {m.pontos}/{m.maxPontos} Points
+                    </span>
+                  </div>
+                  <p className="mb-2 text-sm font-medium">{m.nome}</p>
+                  <Progress
+                    value={(m.pontos / m.maxPontos) * 100}
+                    className={m.status === "Achieved" ? "[&>div]:bg-success" : "[&>div]:bg-primary"}
+                  />
+                  <p className="mt-2 text-xs text-muted-foreground">{m.descricao}</p>
+                </div>
+              ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

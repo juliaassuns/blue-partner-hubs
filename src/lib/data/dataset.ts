@@ -157,20 +157,124 @@ export type Revenda = {
   historico: PontoHistoricoRevenda[];
   variacaoClientes3m: number;
   variacaoPontos3m: number;
-  areas: Record<AreaId, Area>;
+  areas: Record<AreaId, AreaRevenda>;
 };
+
+// Métrica individual dentro de uma categoria (Performance/Skilling/Customer
+// Success), no mesmo formato do painel "Solutions Partner" do Partner Center
+// real: pontos ganhos/máximo, status e um valor bruto com sua própria unidade.
+export type MetricaStatus = "Achieved" | "In Progress";
+
+export type Metrica = {
+  nome: string;
+  categoria: "performance" | "skilling" | "customerSuccess";
+  pontos: number;
+  maxPontos: number;
+  status: MetricaStatus;
+  valorAtual: number;
+  valorMaximo: number;
+  descricao: string;
+};
+
+export type SegmentoDesignacao = "SMB" | "Enterprise";
+
+export type AreaRevenda = Area & {
+  segmento: SegmentoDesignacao;
+  metricas: Metrica[];
+};
+
+const METRICAS_AREA: Record<
+  AreaId,
+  { performance: string; skilling: [string, string]; customerSuccess: [string, string] }
+> = {
+  "modern-work": {
+    performance: "Net Customer Adds",
+    skilling: ["Intermediate certifications", "Advanced certifications"],
+    customerSuccess: ["Deployments – Microsoft 365", "Usage growth – Microsoft 365"],
+  },
+  security: {
+    performance: "Net Customer Adds",
+    skilling: ["Intermediate certifications", "Advanced certifications"],
+    customerSuccess: ["Deployments – Security", "Usage growth – Security"],
+  },
+  infrastructure: {
+    performance: "Net Customer Adds",
+    skilling: ["Intermediate certifications", "Advanced certifications"],
+    customerSuccess: ["Deployments – Azure", "Usage growth – Azure"],
+  },
+  "data-ai": {
+    performance: "Net Customer Adds",
+    skilling: ["Intermediate certifications", "Advanced certifications"],
+    customerSuccess: ["Deployments – Data & AI", "Usage growth – Data & AI"],
+  },
+  "digital-app": {
+    performance: "Net Customer Adds",
+    skilling: ["Intermediate certifications", "Advanced certifications"],
+    customerSuccess: ["Deployments – App Innovation", "Usage growth – App Innovation"],
+  },
+  "business-apps": {
+    performance: "Net Customer Adds",
+    skilling: ["Intermediate certifications", "Advanced certifications"],
+    customerSuccess: ["Deployments – Business Applications", "Usage growth – Business Applications"],
+  },
+};
+
+function splitPontos(total: number, pesoA: number): [number, number] {
+  const a = Math.round(total * pesoA);
+  return [a, Math.max(0, total - a)];
+}
+
+function gerarMetrica(
+  nome: string,
+  categoria: Metrica["categoria"],
+  pontosAtual: number,
+  valorMaximo: number,
+  descricao: (atual: number, max: number) => string,
+): Metrica {
+  const achieved = rnd() > 0.45;
+  const maxPontos = achieved ? Math.max(1, pontosAtual) : pontosAtual + int(2, 12);
+  const valorAtual = achieved
+    ? valorMaximo
+    : Math.max(0, Math.round(valorMaximo * (pontosAtual / maxPontos)));
+  return {
+    nome,
+    categoria,
+    pontos: pontosAtual,
+    maxPontos,
+    status: achieved ? "Achieved" : "In Progress",
+    valorAtual,
+    valorMaximo,
+    descricao: descricao(valorAtual, valorMaximo),
+  };
+}
 
 // Pontuação Solutions Partner própria de cada parceiro MAICPP (não é a mesma
 // coisa que `contribuicoes`, que é quanto o parceiro soma ao placar global da
 // BluePartner). Gerada de forma independente por área/parceiro — não precisa
-// somar exatamente ao placar global, é uma aproximação de mock.
-function gerarAreasRevenda(): Record<AreaId, Area> {
-  const resultado = {} as Record<AreaId, Area>;
+// somar exatamente ao placar global, é uma aproximação de mock. O detalhamento
+// por métrica espelha o formato real do painel Solutions Partner do Partner
+// Center (Performance / Skilling / Customer Success, cada um com suas
+// métricas, pontos/máximo e status Achieved/In Progress).
+function gerarAreasRevenda(segmentoRevenda: string): Record<AreaId, AreaRevenda> {
+  const segmento: SegmentoDesignacao = segmentoRevenda === "Enterprise" ? "Enterprise" : "SMB";
+  const resultado = {} as Record<AreaId, AreaRevenda>;
   for (const base of AREAS) {
     const pontuacao = int(20, 97);
     const performance = Math.round(pontuacao * (0.34 + rnd() * 0.08));
     const skilling = Math.round(pontuacao * (0.28 + rnd() * 0.08));
     const customerSuccess = Math.max(0, pontuacao - performance - skilling);
+    const nomes = METRICAS_AREA[base.id];
+    const [skillInter, skillAdv] = splitPontos(skilling, 0.4 + rnd() * 0.2);
+    const [csDeploy, csUsage] = splitPontos(customerSuccess, 0.4 + rnd() * 0.2);
+
+    const metricas: Metrica[] = [
+      gerarMetrica(nomes.performance, "performance", performance, int(6, 20), (a, m) => `${a} net new customer adds (Maximum: ${m})`),
+      gerarMetrica(nomes.skilling[0], "skilling", skillInter, int(2, 6), (a, m) => `${a} certified individuals (Maximum: ${m})`),
+      gerarMetrica(nomes.skilling[1], "skilling", skillAdv, int(1, 4), (a, m) => `${a} certified individuals (Maximum: ${m})`),
+      gerarMetrica(nomes.customerSuccess[0], "customerSuccess", csDeploy, int(3, 12), (a, m) => `${a} deployment(s) (Maximum: ${m})`),
+      gerarMetrica(nomes.customerSuccess[1], "customerSuccess", csUsage, int(200, 900), (a, m) => `${a} de crescimento de uso mensal (Máximo: ${m})`),
+    ];
+
     resultado[base.id] = {
       id: base.id,
       nome: base.nome,
@@ -181,6 +285,8 @@ function gerarAreasRevenda(): Record<AreaId, Area> {
       skilling,
       customerSuccess,
       designacao: pontuacao >= base.meta * 0.85,
+      segmento,
+      metricas,
     };
   }
   return resultado;
@@ -248,6 +354,7 @@ export const revendas: Revenda[] = Array.from({ length: 70 }, (_, i) => {
     Object.values(contribuicoes).reduce((s, v) => s + v, 0).toFixed(1),
   );
   const status = pick(STATUS_REVENDA);
+  const segmento = pick(SEGMENTOS);
   const saude = status === "Inativa" ? int(18, 42) : status === "Atenção" ? int(40, 64) : int(60, 98);
   const historico = historicoRevenda(contribuicaoMaicpp, qtdClientes);
   const mediaPontosUltimos3 = avg(historico.slice(-3).map((h) => h.contribuicaoMaicpp));
@@ -258,7 +365,7 @@ export const revendas: Revenda[] = Array.from({ length: 70 }, (_, i) => {
     id: `rev-${String(i + 1).padStart(3, "0")}`,
     nome: nomeRevenda(i),
     gerente: pick(GERENTES),
-    segmento: pick(SEGMENTOS),
+    segmento,
     status,
     cidade: pick(CIDADES),
     qtdClientes,
@@ -271,7 +378,7 @@ export const revendas: Revenda[] = Array.from({ length: 70 }, (_, i) => {
     historico,
     variacaoClientes3m: Math.round(mediaClientesUltimos3 - mediaClientesAnteriores3),
     variacaoPontos3m: Number((mediaPontosUltimos3 - mediaPontosAnteriores3).toFixed(1)),
-    areas: gerarAreasRevenda(),
+    areas: gerarAreasRevenda(segmento),
   };
 }).sort((a, b) => b.contribuicaoMaicpp - a.contribuicaoMaicpp);
 
