@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { getPool, sql } from "@/lib/db/client";
+import { mensagemSegura } from "@/lib/http/safe-error";
 
 type LinhaHistorico = {
   data_snapshot: Date;
@@ -37,8 +38,7 @@ export const Route = createFileRoute("/api/partnercenter/historico/$id")({
 
           return Response.json({ pontos });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Erro desconhecido";
-          return new Response(msg, { status: 500 });
+          return new Response(mensagemSegura(e, `GET /api/partnercenter/historico/${params.id}`), { status: 500 });
         }
       },
     },

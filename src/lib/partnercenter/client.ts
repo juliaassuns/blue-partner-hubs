@@ -21,6 +21,8 @@
 //
 // Docs: https://learn.microsoft.com/partner-center/developer/partner-center-authentication
 
+import { ErroSeguro } from "@/lib/http/safe-error";
+
 const BASE_URL = "https://api.partnercenter.microsoft.com/v1";
 const RESOURCE = "https://api.partnercenter.microsoft.com";
 
@@ -29,7 +31,7 @@ let cache: TokenCache | undefined;
 
 function requireEnv(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(`Configuração do Partner Center ausente: ${name}`);
+  if (!value) throw new ErroSeguro(`Configuração do Partner Center ausente: ${name}`);
   return value;
 }
 
@@ -56,7 +58,8 @@ async function getToken(): Promise<string> {
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Falha ao renovar token do Partner Center (${response.status}): ${detail}`);
+    console.error(`Partner Center: falha ao renovar token (${response.status}):`, detail);
+    throw new ErroSeguro(`Falha ao autenticar com o Partner Center (código ${response.status}).`);
   }
 
   const data = (await response.json()) as { access_token: string; expires_in: string };
@@ -72,11 +75,18 @@ export async function pcFetch<T>(path: string): Promise<T> {
 
   if (response.status === 429) {
     const retryAfter = response.headers.get("Retry-After");
-    throw new Error(`Partner Center limitou as requisições (429). Tente novamente em ${retryAfter ?? "alguns"}s.`);
+    throw new ErroSeguro(`Partner Center limitou as requisições (429). Tente novamente em ${retryAfter ?? "alguns"}s.`);
   }
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Erro do Partner Center (${response.status}) em ${path}: ${detail}`);
+    console.error(`Partner Center: erro (${response.status}) em ${path}:`, detail);
+    throw new ErroSeguro(
+      response.status === 401 || response.status === 403
+        ? "Sem permissão delegada para acessar este recurso no Partner Center."
+        : response.status === 404
+          ? "Recurso não encontrado no Partner Center."
+          : `Erro do Partner Center (código ${response.status}).`,
+    );
   }
   return response.json() as Promise<T>;
 }

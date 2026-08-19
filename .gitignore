@@ -19,6 +19,11 @@ deploy.zip
 deploy/
 webjob-dist/
 
+# Segredos locais — nunca devem ser commitados
+.env
+.env.*
+get-pc-token.ps1
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

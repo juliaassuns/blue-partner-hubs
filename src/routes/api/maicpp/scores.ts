@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getPool, sql } from "@/lib/db/client";
 import { buscarAreasReais } from "@/lib/maicpp/scores";
 import { AREAS, type AreaId } from "@/lib/data/dataset";
+import { mensagemSegura } from "@/lib/http/safe-error";
 
 export const Route = createFileRoute("/api/maicpp/scores")({
   server: {
@@ -12,8 +13,7 @@ export const Route = createFileRoute("/api/maicpp/scores")({
           const areas = await buscarAreasReais();
           return Response.json({ areas });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Erro desconhecido";
-          return new Response(msg, { status: 500 });
+          return new Response(mensagemSegura(e, "GET /api/maicpp/scores"), { status: 500 });
         }
       },
       PUT: async ({ request }) => {
@@ -55,8 +55,7 @@ export const Route = createFileRoute("/api/maicpp/scores")({
 
           return Response.json({ ok: true });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Erro desconhecido";
-          return new Response(msg, { status: 500 });
+          return new Response(mensagemSegura(e, "PUT /api/maicpp/scores"), { status: 500 });
         }
       },
     },

@@ -4,11 +4,13 @@
 import { DefaultAzureCredential } from "@azure/identity";
 import sql from "mssql";
 
+import { ErroSeguro } from "@/lib/http/safe-error";
+
 let pool: Promise<sql.ConnectionPool> | undefined;
 
 function requireEnv(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(`Configuração do banco de dados ausente: ${name}`);
+  if (!value) throw new ErroSeguro(`Configuração do banco de dados ausente: ${name}`);
   return value;
 }
 

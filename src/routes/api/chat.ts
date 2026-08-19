@@ -13,6 +13,7 @@ import {
   totais,
   diasRestantes,
 } from "@/lib/data/dataset";
+import { mensagemSegura } from "@/lib/http/safe-error";
 
 function contexto() {
   const areas = AREAS.map(
@@ -84,9 +85,10 @@ export const Route = createFileRoute("/api/chat")({
           });
           return result.toTextStreamResponse();
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Erro desconhecido";
-          console.error("Copilot error:", msg);
-          return new Response(msg, { status: 500 });
+          const status = typeof e === "object" && e && "statusCode" in e ? Number(e.statusCode) : undefined;
+          return new Response(mensagemSegura(e, "POST /api/chat"), {
+            status: status === 429 || status === 402 ? status : 500,
+          });
         }
       },
     },

@@ -46,8 +46,9 @@ export async function buscarAreasReais(): Promise<AreaReal[]> {
         fonte: "real",
       };
     });
-  } catch {
+  } catch (e) {
     // Banco indisponível — segue com os valores mockados sem quebrar a página.
+    console.error("buscarAreasReais: banco indisponível, usando fallback mock:", e);
     return AREAS.map((a) => ({ ...a, atualizadoEm: null, atualizadoPor: null, fonte: "mock" as const }));
   }
 }

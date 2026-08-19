@@ -108,7 +108,8 @@ export async function buscarRevendasReais(): Promise<{ dados: Revenda[]; fonte: 
       .map(mapRevenda)
       .sort((a, b) => b.contribuicaoMaicpp - a.contribuicaoMaicpp);
     return { dados, fonte: "real" };
-  } catch {
+  } catch (e) {
+    console.error("buscarRevendasReais: banco indisponível, usando fallback mock:", e);
     return { dados: revendasMock, fonte: "mock" };
   }
 }
@@ -119,7 +120,8 @@ export async function buscarClientesReais(): Promise<{ dados: Cliente[]; fonte: 
     const resultado = await pool.request().query<LinhaCliente>(`SELECT * FROM clientes`);
     if (resultado.recordset.length === 0) return { dados: clientesMock, fonte: "mock" };
     return { dados: resultado.recordset.map(mapCliente), fonte: "real" };
-  } catch {
+  } catch (e) {
+    console.error("buscarClientesReais: banco indisponível, usando fallback mock:", e);
     return { dados: clientesMock, fonte: "mock" };
   }
 }
